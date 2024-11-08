@@ -1,18 +1,18 @@
 type ScreenFile = {
-  name: string,
-  dataUrl: string
-}
+  name: string;
+  dataUrl: string;
+};
 
 type Connection = {
-  host: string,
-  username: string,
-  password: string,
-}
+  host: string;
+  username: string;
+  password: string;
+};
 
 type StaticScreenProps = {
   theme: 'light' | 'dark';
   download: boolean;
-}
+};
 
 type CustomInfo = {
   lostText: string;
@@ -20,7 +20,7 @@ type CustomInfo = {
     type: string;
     value: string;
   }[];
-}
+};
 
 type CustomizableScreenProps = {
   theme: 'light' | 'dark';
@@ -30,7 +30,7 @@ type CustomizableScreenProps = {
     value: string;
   }[];
   download: boolean;
-}
+};
 
 type CurrentScreensProps = {
   connection: Connection | null;
@@ -40,7 +40,7 @@ type CurrentScreensProps = {
   getFiles: Function;
   setScreenSelect: Function;
   revertScreen: Function;
-}
+};
 
 type UploadScreenProps = {
   connection: Connection | null;
@@ -53,7 +53,7 @@ type UploadScreenProps = {
   getFiles: Function;
   setScreenSelect: Function;
   setScreenMode: Function;
-}
+};
 
 type CreateScreenProps = {
   connection: Connection | null;
@@ -61,7 +61,16 @@ type CreateScreenProps = {
   getFiles: Function;
   setScreenSelect: Function;
   setScreenMode: Function;
-}
+};
+
+type DeviceInfo = {
+  id?: string;
+  addDate?: Date;
+  type?: 'rm1' | 'rm2' | 'rmPro';
+  method?: 'wifi' | 'usb';
+  displayName?: string;
+  connection?: Connection;
+};
 
 // Export
 export type {
@@ -72,5 +81,6 @@ export type {
   CustomizableScreenProps,
   CurrentScreensProps,
   UploadScreenProps,
-  CreateScreenProps
-}
+  CreateScreenProps,
+  DeviceInfo,
+};

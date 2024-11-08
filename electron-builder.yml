@@ -1,0 +1,59 @@
+appId: com.danielstoiber.replace
+productName: rePlace
+copyright: Copyright © 2024 Daniel Stoiber
+
+directories:
+  output: dist
+  buildResources: resources
+
+files:
+  - from: .
+    filter:
+      - package.json
+      - app
+
+mac:
+  target:
+    - target: dmg
+      arch: universal
+  artifactName: '${productName}-${version}-macos.${ext}'
+  hardenedRuntime: true
+  gatekeeperAssess: false
+
+dmg:
+  sign: false
+  icon: 'resources/icon.png'
+  # background: "resources/dmg-background.png"
+  contents:
+    - x: 130
+      y: 220
+      type: link
+      path: /Applications
+    - x: 410
+      y: 220
+      type: file
+
+win:
+  target:
+    - target: nsis
+      arch: x64
+  artifactName: '${productName}-${version}-win.${ext}'
+
+nsis:
+  oneClick: false
+  perMachine: true
+  allowToChangeInstallationDirectory: true
+  artifactName: '${productName}-${version}-setup.exe'
+
+linux:
+  target:
+    - target: AppImage
+      arch: x64
+    - target: deb
+      arch: x64
+  artifactName: '${productName}-${version}-linux.${ext}'
+  category: Utility
+  synopsis: 'A cross-platform application by Daniel Stoiber'
+  description: 'rePlace is an application designed to perform efficient cross-platform operations.'
+  maintainer: 'Daniel Stoiber <contact@example.com>'
+  icon: 'resources/icon.png'
