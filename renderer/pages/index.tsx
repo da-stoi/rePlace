@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '../lib/utils';
+import notify from '../lib/notify';
+import { UpdateDetails } from '../types';
 
 export default function StartupAnimation() {
   const [open, setOpen] = useState<boolean>(false);
@@ -24,6 +26,22 @@ export default function StartupAnimation() {
   }, [open]);
 
   useEffect(() => {
+    window.ipc.getUpdate();
+
+    window.ipc.on('get-update-res', (details: UpdateDetails | false) => {
+      if (details) {
+        notify(
+          'Update available',
+          `A new version of rePlace is available for download: ${details.name}`,
+          () => {
+            window.location.href = `/settings${
+              window.isProd ? '.html' : ''
+            }#update`;
+          }
+        );
+      }
+    });
+
     // Open animation
     setTimeout(() => {
       setOpen(true);
@@ -40,23 +58,15 @@ export default function StartupAnimation() {
 
     // Redirect
     setTimeout(() => {
-      console.log('window', window);
-
       if (!window.ipc) {
         console.warn('ipc is not available on window');
         return;
       }
 
-      console.log('isProd', window.isProd);
-
-      // window.location.href = `./connection${
-      //   window.isProd ? '.html' : ''
-      // }?host=192.168.1.198&username=root&password=c8o6axKmX2`;
-
       if (window.isProd) {
-        window.location.href = './connect.html';
+        window.location.href = './main.html';
       } else {
-        window.location.href = './connect';
+        window.location.href = './main';
       }
     }, 3200);
   }, []);
@@ -100,7 +110,7 @@ export default function StartupAnimation() {
           open ? 'opacity-100' : 'opacity-0'
         )}
       >
-        Built with ❤️ and purpose
+        Built with <span className='font-mono text-xl'>❤</span> and purpose
       </p>
       <p
         className={cn(

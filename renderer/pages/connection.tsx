@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { DeviceInfo } from '../types';
+import { DeviceInfo, DeviceMethod, DeviceType, ScreenFile } from '../types';
 import Header from '../components/header';
 import PageLoader from '../components/page-load';
 import { Dialog, DialogContent } from '../components/ui/dialog';
@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown';
+import Image from 'next/image';
 
 function ConnectingModal({
   connected,
@@ -87,6 +88,7 @@ export default function Connection() {
   const [retryCount, setRetryCount] = useState<number>(0);
   const [connected, setConnected] = useState<boolean>(false);
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
+  const [screens, setScreens] = useState<ScreenFile[]>([]);
 
   const heartbeatIntervalRef = useRef(heartbeatInterval);
   const connectionFailedRef = useRef(connectionFailed);
@@ -112,19 +114,20 @@ export default function Connection() {
     // Get query params
     const urlParams = new URLSearchParams(window.location.search);
     const displayName = urlParams.get('displayName');
-    const type = urlParams.get('type') as 'rm1' | 'rm2' | 'rmPro';
-    const method = urlParams.get('method') as 'wifi' | 'usb';
+    const type = urlParams.get('type') as DeviceType;
+    const method = urlParams.get('method') as DeviceMethod;
     const host = urlParams.get('host');
+    const port = parseInt(urlParams.get('port'));
     const username = urlParams.get('username');
     const password = urlParams.get('password');
 
-    if (!host || !username || !password) {
+    if (!host || !username || !password || !port) {
+      window.location.href = `./main${window.isProd ? '.html' : ''}`;
       return;
     }
 
     // Start ipc event listeners
     window.ipc.on('connect-device-res', (res: { connected: boolean }) => {
-      console.log('connect-device', res.connected);
       setConnected(res.connected);
       setRetryCount(0);
       setLastHeartbeat(Date.now());
@@ -136,7 +139,6 @@ export default function Connection() {
     });
 
     window.ipc.on('check-device-res', (res: { connected: boolean }) => {
-      console.log('check-device', res.connected);
       setLastHeartbeat(Date.now());
       if (res.connected !== connectedRef.current) {
         if (res.connected) {
@@ -146,9 +148,14 @@ export default function Connection() {
       }
     });
 
+    window.ipc.on('get-files-res', (res: ScreenFile[]) => {
+      setScreens(res);
+    });
+
     setDeviceInfo({
       connection: {
         host,
+        port,
         username,
         password,
       },
@@ -160,8 +167,9 @@ export default function Connection() {
 
   // Check connection every 5 seconds
   useEffect(() => {
+    getFiles();
+
     const interval = setInterval(() => {
-      console.log('INTERVAL: Checking connection...');
       checkConnection();
     }, 5000);
 
@@ -180,13 +188,6 @@ export default function Connection() {
   }, [connectionFailed]);
 
   const checkConnection = () => {
-    console.log(
-      connectionFailedRef.current,
-      connectedRef.current,
-      lastHeartbeatRef.current,
-      retryCountRef.current
-    );
-
     if (connectionFailedRef.current) {
       return;
     }
@@ -219,15 +220,19 @@ export default function Connection() {
   };
 
   const disconnectDevice = () => {
-    console.log(window.ipc);
-
     window.ipc?.disconnectDevice();
-    window.location.href = `./connect${window.isProd ? '.html' : ''}`;
+    window.location.href = `./main${window.isProd ? '.html' : ''}`;
+  };
+
+  const getFiles = async () => {
+    if (!deviceInfo) {
+      return;
+    }
+
+    window.ipc.getFiles(deviceInfo.connection);
   };
 
   useEffect(() => {
-    console.log('Connection details changed, connecting  to device...');
-
     // Connect to device
     connectDevice();
   }, [deviceInfo]);
@@ -238,18 +243,22 @@ export default function Connection() {
 
   return (
     <div className='mt-20'>
-      <div className='fixed top-0 p-10 w-full flex flex-row justify-between'>
+      <div className='fixed top-0 pl-10 pt-16 w-max mr-10 right-0 flex flex-row'>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <div className='bg-muted py-2 px-3 flex flex-row gap-2 rounded select-none'>
               <div
                 className={cn(
                   'size-2.5 rounded-full m-auto',
-                  connected ? 'bg-connected' : 'bg-disconnected'
+                  connected
+                    ? 'bg-green-600 dark:bg-green-700'
+                    : 'bg-amber-600 dark:bg-amber-700'
                 )}
               />
 
-              <h3 className='m-auto'>{deviceInfo.displayName}</h3>
+              <h3 className='m-auto'>
+                {deviceInfo.displayName || 'reMarkable'}
+              </h3>
               {/* <p className='m-auto text-sm'>{deviceInfo.host}</p> */}
             </div>
           </DropdownMenuTrigger>
@@ -268,7 +277,34 @@ export default function Connection() {
         </DropdownMenu>
         {/* <Button></Button> */}
       </div>
-      {/* <code>{JSON.stringify(deviceInfo, null, 2)}</code> */}
+
+      <div className='flex flex-col items-center mt-32 mx-10'>
+        <h1 className='text-3xl font-bold'>Screens</h1>
+        <div className='w-full flex flex-row flex-wrap gap-4 mt-6 m-auto'>
+          {screens &&
+            screens.length > 0 &&
+            screens.map((screen) => (
+              <div
+                key={screen.name}
+                className='m-auto'
+              >
+                <Image
+                  src={`${screen.dataUrl}`}
+                  alt={screen.name}
+                  className='rounded-md'
+                  width={220}
+                  height={280}
+                />
+              </div>
+            ))}
+
+          {screens.length === 0 && (
+            <h3 className='text-xl text-center'>No screens found</h3>
+          )}
+        </div>
+      </div>
+
+      {/* Connecting modal */}
       <ConnectingModal
         connected={connected}
         connectionFailed={connectionFailed}
@@ -277,9 +313,7 @@ export default function Connection() {
           setRetryCount(0);
           connectDevice();
         }}
-        back={() => {
-          window.location.href = './connect';
-        }}
+        back={disconnectDevice}
       />
     </div>
   );

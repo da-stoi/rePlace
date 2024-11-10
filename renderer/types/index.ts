@@ -5,6 +5,7 @@ type ScreenFile = {
 
 type Connection = {
   host: string;
+  port: number;
   username: string;
   password: string;
 };
@@ -63,13 +64,47 @@ type CreateScreenProps = {
   setScreenMode: Function;
 };
 
+type HostStatus = {
+  id: string;
+  alive: boolean;
+};
+
+type DeviceMethod = 'wifi' | 'usb' | 'redockable';
+type DeviceType = 'rm1' | 'rm2' | 'rmpro' | 'redockable';
+
 type DeviceInfo = {
   id?: string;
   addDate?: Date;
-  type?: 'rm1' | 'rm2' | 'rmPro';
-  method?: 'wifi' | 'usb';
+  type?: DeviceType;
+  method?: DeviceMethod;
   displayName?: string;
   connection?: Connection;
+};
+
+type UserSettings = {
+  preRelease: boolean; // If the user wants to receive pre-release updates
+  developerMode: boolean; // If the user wants to enable developer mode
+};
+
+type Asset = {
+  platform: string;
+  browser_download_url: string;
+};
+
+type UpdateDetails = {
+  id: string; // tag_name
+  name: string; // name
+  preRelease: boolean; // prerelease
+  publishedAt: Date; // published_at
+  body: string;
+  platformAsset?: Asset;
+  assets: Asset[];
+};
+
+type ScreenInfo = {
+  id: string;
+  name: string;
+  dataUrl: string;
 };
 
 // Export
@@ -83,4 +118,11 @@ export type {
   UploadScreenProps,
   CreateScreenProps,
   DeviceInfo,
+  DeviceMethod,
+  DeviceType,
+  HostStatus,
+  UserSettings,
+  UpdateDetails,
+  Asset,
+  ScreenInfo,
 };

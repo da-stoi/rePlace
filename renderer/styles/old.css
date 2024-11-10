@@ -1,0 +1,90 @@
+:root {
+  --background: #efefef;
+  /* background-color */
+  --foreground: #212121;
+  /* text-color */
+  --card: #ffffff;
+  /* card-background */
+  --card-foreground: #212121;
+  /* text-color */
+  --popover: #ffffff;
+  /* card-background */
+  --popover-foreground: #212121;
+  /* text-color */
+  --primary: #2559f4;
+  /* connected-color */
+  --primary-foreground: #ffffff;
+  /* button-active-text */
+  --secondary: #dadada;
+  /* button-background */
+  --secondary-foreground: #212121;
+  /* text-color */
+  --muted: #dadada;
+  /* button-background */
+  --muted-foreground: #808080;
+  /* button-disabled-text */
+  --accent: #dadada;
+  /* button-background */
+  --accent-foreground: #212121;
+  /* text-color */
+  --destructive: #CB7428;
+  /* disconnected-color */
+  --destructive-foreground: #ffffff;
+  /* button-active-text */
+  --border: #dadada;
+  /* input-background */
+  --input: #dadada;
+  /* input-background */
+  --ring: #2559f4;
+  /* connected-color */
+  --radius: 0.5rem;
+  --connected: #21854b;
+  /* connected-color */
+  --disconnected: #CB7428;
+  /* disconnected-color */
+}
+
+.dark {
+  --background: #212121;
+  /* background-color in dark theme */
+  --foreground: #ffffff;
+  /* text-color in dark theme */
+  --card: #424242;
+  /* card-background in dark theme */
+  --card-foreground: #ffffff;
+  /* text-color in dark theme */
+  --popover: #424242;
+  /* card-background in dark theme */
+  --popover-foreground: #ffffff;
+  /* text-color in dark theme */
+  --primary: #2559f4;
+  /* connected-color */
+  --primary-foreground: #212121;
+  /* button-active-text in dark theme */
+  --secondary: #616161;
+  /* button-background in dark theme */
+  --secondary-foreground: #ffffff;
+  /* text-color in dark theme */
+  --muted: #616161;
+  /* button-background in dark theme */
+  --muted-foreground: #808080;
+  /* button-disabled-text */
+  --accent: #616161;
+  /* button-background in dark theme */
+  --accent-foreground: #ffffff;
+  /* text-color in dark theme */
+  --destructive: #CB7428;
+  /* disconnected-color */
+  --destructive-foreground: #ffffff;
+  /* button-active-text in dark theme */
+  --border: #616161;
+  /* input-background in dark theme */
+  --input: #616161;
+  /* input-background in dark theme */
+  --ring: #2559f4;
+  /* connected-color */
+  --connected: #21854b;
+  /* connected-color */
+  --disconnected: #CB7428;
+  /* disconnected-color */
+}

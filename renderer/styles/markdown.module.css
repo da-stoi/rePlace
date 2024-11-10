@@ -1,0 +1,74 @@
+.reactMarkDown {
+  /* some root styles here */
+}
+
+.reactMarkDown li {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  margin-left: 2em;
+  display: list-item;
+  text-align: -webkit-match-parent;
+}
+
+.reactMarkDown ul {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  list-style: disc outside none;
+}
+
+.reactMarkDown ol {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  list-style: decimal outside none;
+}
+
+.reactMarkDown li ul {
+  margin-top: 0;
+  list-style: circle outside none;
+}
+
+.reactMarkDown p {
+  font-weight: 400;
+  white-space: pre-wrap;
+  margin-top: 0.75em;
+}
+
+.reactMarkDown h1 {
+  margin-top: 0.75em;
+}
+
+.reactMarkDown h2 {
+  margin-top: 0.75em;
+}
+
+.reactMarkDown h3 {
+  margin-top: 0.75em;
+}
+
+.reactMarkDown h4 {
+  margin-top: 0.75em;
+}
+
+.reactMarkDown h5 {
+  margin-top: 0.75em;
+}
+
+.reactMarkDown h6 {
+  margin-top: 0.75em;
+}
+
+.reactMarkDown a {
+  /* color: var(--primary); */
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.reactMarkDown a:hover {
+  text-decoration: none;
+}
+
+/* .reactMarkDown code {
+  font-size: 0.85em;
+  font-family: 'Fira Code', monospace;
+  background-color: var(--secondary);
+} */

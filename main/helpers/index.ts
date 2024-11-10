@@ -1,1 +1,3 @@
-export * from './create-window';
+export * from './createWindow';
+export * from './detectOS';
+export * from './updateCheck';

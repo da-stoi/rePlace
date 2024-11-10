@@ -193,8 +193,6 @@ const Home: NextPage = () => {
         />
       </Head>
 
-      <Link href='/'>Splash screen</Link>
-
       <div className={styles.inlineHeader}>
         <NextImage
           src='/logo.png'

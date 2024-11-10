@@ -1,39 +1,30 @@
-import { useEffect, useState } from 'react';
-import Header from '../components/header';
-import { Button } from '../components/ui/button';
-import { Dialog, DialogContent } from '../components/ui/dialog';
-import { Connection, DeviceInfo } from '../types';
+import { Wifi, Cable, EyeClosed, Eye } from 'lucide-react';
+import { useState } from 'react';
 import { cn } from '../lib/utils';
-import { Cable, Ellipsis, Eye, EyeClosed, Plus, Wifi } from 'lucide-react';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
+import { DeviceInfo, DeviceType, DeviceMethod, Connection } from '../types';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../components/ui/tooltip';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../components/ui/dropdown';
-import { ScrollArea } from '../components/ui/scroll-area';
+} from './ui/tooltip';
+import { Label } from './ui/label';
 
 // Step 0: Select device type
 function DeviceSelector({
   existingDevices,
-  cancel,
   deviceInfo,
+  developerMode,
+  cancel,
   handleDeviceSelect,
 }: {
   existingDevices: boolean;
-  cancel: () => void;
   deviceInfo: DeviceInfo;
-  handleDeviceSelect: (type: 'rm1' | 'rm2' | 'rmPro') => void;
+  developerMode: boolean;
+  cancel: () => void;
+  handleDeviceSelect: (type: DeviceType) => void;
 }) {
   return (
     <>
@@ -57,16 +48,26 @@ function DeviceSelector({
         </Button>
         <Button
           variant='outline'
-          className={cn('size-28', deviceInfo.type === 'rmPro' && 'outline')}
-          onClick={() => handleDeviceSelect('rmPro')}
+          className={cn('size-28', deviceInfo.type === 'rmpro' && 'outline')}
+          onClick={() => handleDeviceSelect('rmpro')}
         >
           <h1 className='text-xl'>rM Pro</h1>
         </Button>
       </div>
+      {developerMode && (
+        <Button
+          variant='outline'
+          className={cn('p-8', deviceInfo.type === 'redockable' && 'outline')}
+          onClick={() => handleDeviceSelect('redockable')}
+        >
+          <h1 className='text-xl'>reDockable</h1>
+        </Button>
+      )}
       {existingDevices && (
         <Button
-          variant='ghost'
+          variant='secondary'
           onClick={cancel}
+          className='mt-5'
         >
           Cancel
         </Button>
@@ -82,7 +83,7 @@ function ConnectionMethodSelector({
   back,
 }: {
   deviceInfo: DeviceInfo;
-  handleConnectionMethodSelect: (method: 'wifi' | 'usb') => void;
+  handleConnectionMethodSelect: (method: DeviceMethod) => void;
   back: () => void;
 }) {
   return (
@@ -113,7 +114,7 @@ function ConnectionMethodSelector({
         </Button>
       </div>
       <Button
-        variant='ghost'
+        variant='secondary'
         onClick={back}
       >
         Back
@@ -125,52 +126,85 @@ function ConnectionMethodSelector({
 // Step 2: Configure connection details
 function ConnectionDetails({
   deviceInfo,
+  developerMode,
   handleConnectionDetailsSubmit,
   back,
 }: {
   deviceInfo: DeviceInfo;
+  startInAdvanced: boolean;
+  developerMode: boolean;
   handleConnectionDetailsSubmit: (connection: Connection) => void;
   back: () => void;
 }) {
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [host, setHost] = useState(deviceInfo.connection?.host || '');
+  const [host, setHost] = useState(deviceInfo?.connection?.host || '');
+  const [port, setPort] = useState<number | ''>(
+    deviceInfo?.connection?.port || 22
+  );
   const [username, setUsername] = useState(
-    deviceInfo.connection?.username || ''
+    deviceInfo?.connection?.username || ''
   );
   const [password, setPassword] = useState(
-    deviceInfo.connection?.password || ''
+    deviceInfo?.connection?.password || ''
   );
 
   return (
     <>
       <h1 className='text-2xl text-center'>Connection Details</h1>
       <div className='flex flex-col gap-2 my-4 w-72'>
-        {(showAdvanced || deviceInfo.method === 'wifi') && (
-          <div>
-            <Label
-              htmlFor='host'
-              className='text-left'
-            >
-              IP Address (Host)
-            </Label>
-            <Input
-              id='host'
-              type='text'
-              className='input'
-              placeholder='10.11.99.1'
-              value={host}
-              onChange={(e) => setHost(e.target.value)}
-            />
+        {(deviceInfo.method === 'wifi' || developerMode) && (
+          <div className='flex flex-row gap-4'>
+            <div className={cn(developerMode ? 'basis-3/4' : 'basis-full')}>
+              <Label
+                htmlFor='host'
+                className='text-left'
+              >
+                IP Address (Host)<span className='text-destructive'>*</span>
+              </Label>
+              <Input
+                id='host'
+                type='text'
+                className='input'
+                placeholder='10.11.99.1'
+                value={host}
+                onChange={(e) => setHost(e.target.value)}
+              />
+            </div>
+            {developerMode && (
+              <div className='basis-1/4'>
+                <Label
+                  htmlFor='host'
+                  className='text-left'
+                >
+                  Port<span className='text-destructive'>*</span>
+                </Label>
+                <Input
+                  id='host'
+                  type='number'
+                  className='input'
+                  placeholder='22'
+                  value={port}
+                  onChange={(e) =>
+                    setPort(
+                      Number.isNaN(parseInt(e.target.value))
+                        ? e.target.value === ''
+                          ? ''
+                          : 22
+                        : parseInt(e.target.value)
+                    )
+                  }
+                />
+              </div>
+            )}
           </div>
         )}
-        {showAdvanced && (
+        {developerMode && (
           <div>
             <Label
               htmlFor='username'
               className='text-left'
             >
-              Username
+              Username<span className='text-destructive'>*</span>
             </Label>
             <Input
               id='username'
@@ -188,7 +222,7 @@ function ConnectionDetails({
             htmlFor='password'
             className='text-left'
           >
-            Password
+            Password<span className='text-destructive'>*</span>
           </Label>
           <div className='flex flex-row'>
             <Input
@@ -224,32 +258,35 @@ function ConnectionDetails({
           </div>
         </div>
         <span
-          className='underline hover:no-underline cursor-pointer w-max m-auto inline select-none'
+          className='underline hover:no-underline text-muted-foreground cursor-pointer w-max m-auto inline select-none'
           onClick={() =>
-            window?.ipc.send('external-link', 'https://remarkable.com/')
+            window.ipc.externalLink(
+              'https://remarkable.guide/guide/access/ssh.html#finding-your-device-password-and-ip-addresses'
+            )
           }
         >
-          {' '}
           Where do I find this?
-        </span>
-        <span
-          className='text-sm underline hover:no-underline text-muted-foreground cursor-pointer w-max m-auto inline select-none'
-          onClick={() => setShowAdvanced(!showAdvanced)}
-        >
-          {showAdvanced ? 'Basic' : 'Advanced'} Setup
         </span>
       </div>
       <div className='space-x-2'>
         <Button
-          variant='ghost'
+          variant='secondary'
           onClick={back}
         >
           Back
         </Button>
         <Button
-          variant='outline'
+          className='text-background'
+          disabled={!host || !username || !password || !port}
           onClick={() =>
-            handleConnectionDetailsSubmit({ host, username, password })
+            handleConnectionDetailsSubmit({
+              host,
+              port: !Number.isNaN(parseInt(String(port)))
+                ? parseInt(String(port))
+                : 22,
+              username,
+              password,
+            })
           }
         >
           Continue
@@ -259,21 +296,24 @@ function ConnectionDetails({
   );
 }
 
+// Step 3: Save device
 function SaveDevice({
   deviceInfo,
+  editingDevice,
   handleDeviceSave,
   back,
 }: {
   deviceInfo: DeviceInfo;
+  editingDevice: DeviceInfo;
   handleDeviceSave: (displayName: string) => void;
   back: () => void;
 }) {
-  const [deviceName, setDeviceName] = useState('');
+  const [deviceName, setDeviceName] = useState(editingDevice.displayName || '');
 
   return (
     <>
       <h1 className='text-2xl text-center'>Name Your Device</h1>
-      <div className='flex flex-col gap-2 my-4 w-72'>
+      <div className='flex flex-col gap-2 mt-4 w-72'>
         <Label
           htmlFor='deviceName'
           className='text-left'
@@ -289,46 +329,100 @@ function SaveDevice({
           onChange={(e) => setDeviceName(e.target.value)}
         />
       </div>
+      <span
+        className='underline hover:no-underline text-muted-foreground select-none cursor-pointer mb-4'
+        onClick={() => {
+          window.location.href = `/connection${
+            window.isProd ? '.html' : ''
+          }?host=${deviceInfo?.connection?.host}&port=${
+            deviceInfo?.connection?.port
+          }&username=${deviceInfo?.connection?.username}&password=${
+            deviceInfo?.connection?.password
+          }&displayName=${deviceName}&type=${deviceInfo.type}&method=${
+            deviceInfo.method
+          }`;
+        }}
+      >
+        Connect without saving
+      </span>
       <div className='space-x-2'>
         <Button
-          variant='ghost'
+          variant='secondary'
           onClick={back}
         >
           Back
         </Button>
         <Button
-          variant='outline'
-          onClick={() => handleDeviceSave(deviceName)}
+          className='text-background'
+          onClick={() => handleDeviceSave(deviceName || 'Unnamed reMarkable')}
         >
-          Save
+          {editingDevice.id ? 'Save Changes' : 'Save'}
         </Button>
       </div>
-      <span className='underline hover:no-underline select-none cursor-pointer'>
-        Connect without saving
-      </span>
     </>
   );
 }
 
-function NewDevice({
+export default function NewDevice({
   existingDevices,
+  developerMode,
+  editingDevice,
+  // handleAddOrEditDevice,
   getDevices,
   setAddDevice,
 }: {
   existingDevices: boolean;
+  developerMode: boolean;
+  editingDevice: DeviceInfo;
+  // handleAddOrEditDevice: (existingDevice: DeviceInfo) => void;
   getDevices: () => void;
   setAddDevice: (addDevice: boolean) => void;
 }) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>({});
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>(
+    editingDevice ? editingDevice : {}
+  );
 
   // Back button
   const back = () => {
+    // If we're on step 2 and the device is redockable, go back to step 0
+    if (currentStep === 2 && deviceInfo.method === 'redockable') {
+      setCurrentStep(0);
+      return;
+    }
+
     setCurrentStep(currentStep - 1);
   };
 
   // Step 0: Select device type
-  const handleDeviceSelect = (type: 'rm1' | 'rm2' | 'rmPro') => {
+  const handleDeviceSelect = (type: DeviceType) => {
+    if (type === 'redockable') {
+      setDeviceInfo(
+        (deviceInfo) =>
+          ({
+            ...deviceInfo,
+            type,
+            method: deviceInfo.method ? deviceInfo.method : 'redockable',
+            connection: {
+              host: deviceInfo?.connection?.host
+                ? deviceInfo?.connection?.host
+                : '127.0.0.1',
+              username: deviceInfo?.connection?.username
+                ? deviceInfo?.connection?.username
+                : 'redockable',
+              password: deviceInfo?.connection?.password
+                ? deviceInfo?.connection?.password
+                : '',
+              port: deviceInfo?.connection?.port
+                ? deviceInfo?.connection?.port
+                : 22,
+            },
+          } as DeviceInfo)
+      );
+      setCurrentStep(2);
+      return;
+    }
+
     setDeviceInfo({
       ...deviceInfo,
       type,
@@ -337,16 +431,30 @@ function NewDevice({
   };
 
   // Step 1: Select connection method
-  const handleConnectionMethodSelect = (method: 'wifi' | 'usb') => {
-    setDeviceInfo({
-      ...deviceInfo,
-      method,
-      connection: {
-        host: method === 'usb' ? '10.11.99.1' : '',
-        username: 'root',
-        password: '',
-      },
-    });
+  const handleConnectionMethodSelect = (method: DeviceMethod) => {
+    setDeviceInfo(
+      (deviceInfo) =>
+        ({
+          ...deviceInfo,
+          method,
+          connection: {
+            host: deviceInfo?.connection?.host
+              ? deviceInfo?.connection?.host
+              : method === 'usb'
+              ? '10.11.99.1'
+              : '',
+            username: deviceInfo?.connection?.username
+              ? deviceInfo?.connection?.username
+              : 'root',
+            password: deviceInfo?.connection?.password
+              ? deviceInfo?.connection?.password
+              : '',
+            port: deviceInfo?.connection?.port
+              ? deviceInfo?.connection?.port
+              : 22,
+          },
+        } as DeviceInfo)
+    );
     setCurrentStep(2);
   };
 
@@ -368,8 +476,7 @@ function NewDevice({
     };
 
     try {
-      console.log('fullDeviceInfo', fullDeviceInfo);
-      window.ipc?.send('add-device', fullDeviceInfo);
+      window.ipc.addDevice(fullDeviceInfo);
       getDevices(); // Refresh devices
       setAddDevice(false); // Close add screen
     } catch (e) {
@@ -379,7 +486,7 @@ function NewDevice({
 
   const cancel = () => {
     setDeviceInfo({}); // Reset device info
-    setAddDevice(false);
+    setAddDevice(false); // Close add
   };
 
   return (
@@ -387,6 +494,7 @@ function NewDevice({
       {/* <code>{JSON.stringify(deviceInfo, null, 2)}</code> */}
       {currentStep === 0 && (
         <DeviceSelector
+          developerMode={developerMode}
           existingDevices={existingDevices}
           cancel={() => cancel()}
           deviceInfo={deviceInfo}
@@ -403,6 +511,8 @@ function NewDevice({
       {currentStep === 2 && (
         <ConnectionDetails
           deviceInfo={deviceInfo}
+          developerMode={developerMode}
+          startInAdvanced={deviceInfo.method === 'redockable'}
           handleConnectionDetailsSubmit={handleConnectionDetailsSubmit}
           back={back}
         />
@@ -410,163 +520,11 @@ function NewDevice({
       {currentStep === 3 && (
         <SaveDevice
           deviceInfo={deviceInfo}
+          editingDevice={editingDevice}
           handleDeviceSave={handleDeviceSave}
           back={back}
         />
       )}
     </>
-  );
-}
-
-function DeviceManager({
-  devices,
-  getDevices,
-  setAddDevice,
-}: {
-  devices: DeviceInfo[];
-  getDevices: () => void;
-  setAddDevice: (addDevice: boolean) => void;
-}) {
-  const removeDevice = (id: string) => {
-    window.ipc?.send('remove-device', id);
-    getDevices();
-  };
-
-  return (
-    <>
-      <h1 className='text-2xl text-center'>Your Devices</h1>
-      {/* <code>{JSON.stringify(devices, null, 2)}</code> */}
-      <ScrollArea className='max-h-72 h-fit w-full overflow-scroll'>
-        <div className='flex flex-col gap-3 my-4 w-full'>
-          {devices.map((device, index) => (
-            <div
-              key={device.connection.host}
-              className='flex flex-row gap-2 border p-2 rounded-lg'
-            >
-              {/* Connection method icon */}
-              {device.method === 'wifi' ? (
-                <Wifi className='size-10 mx-3 m-auto' />
-              ) : (
-                <Cable className='size-10 mx-3 m-auto' />
-              )}
-              {/* Main device content */}
-              <div className='flex flex-col w-full gap-1'>
-                <h1 className='text-lg content-end'>{device.displayName}</h1>
-                <p className='text-muted-foreground text-sm justify-self-stretch'>
-                  {device.type === 'rm1'
-                    ? 'rM 1'
-                    : device.type === 'rm2'
-                    ? 'rM 2'
-                    : device.type === 'rmPro'
-                    ? 'rM Pro'
-                    : 'Unknown Device'}{' '}
-                  | {device.connection.host}
-                </p>
-                {/* <p className='text-muted-foreground text-xs'>
-                  Added {new Date(device.addDate).toLocaleDateString()}
-                </p> */}
-              </div>
-              <Button
-                variant='secondary'
-                className='m-auto mr-3'
-                onClick={() =>
-                  (window.location.href = `/connection${
-                    window.isProd ? '.html' : ''
-                  }?host=${device.connection.host}&username=${
-                    device.connection.username
-                  }&password=${device.connection.password}&displayName=${
-                    device.displayName
-                  }&type=${device.type}&method=${device.method}`)
-                }
-              >
-                Connect
-              </Button>
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
-      <Button
-        variant='outline'
-        // size='icon'
-        onClick={() => setAddDevice(true)}
-      >
-        <Plus className='h-6 w-6' /> Add Device
-      </Button>
-    </>
-  );
-}
-
-export default function Connect() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [devices, setDevices] = useState<DeviceInfo[]>([
-    {
-      id: 'rm2-1633660000000',
-      addDate: new Date('2003-05-03'),
-      type: 'rm2',
-      method: 'wifi',
-      connection: {
-        host: '192.168.1.198',
-        username: 'root',
-        password: 'c8o6axKmX2',
-      },
-      displayName: "Daniel's rM2",
-    },
-    {
-      id: 'rm2-1633660000001',
-      addDate: new Date('2000-02-26'),
-      type: 'rmPro',
-      method: 'usb',
-      connection: {
-        host: '10.11.99.1',
-        username: 'root',
-        password: 'c8o6axKmX2',
-      },
-      displayName: "Lukas' rM Pro",
-    },
-  ]);
-  const [addDevice, setAddDevice] = useState(false);
-
-  // Open modal on page load
-  useEffect(() => {
-    getDevices();
-
-    window.ipc.on('get-devices-res', (devices: DeviceInfo[]) => {
-      console.log('devices', devices);
-      setDevices(devices);
-    });
-
-    window.ipc.on;
-
-    window.ipc.on('log', (msg: string) => {
-      console.log(msg);
-    });
-
-    setModalOpen(true);
-  }, []);
-
-  const getDevices = () => {
-    window.ipc?.send('get-devices', null);
-  };
-
-  return (
-    <div className='mt-20'>
-      <Dialog open={modalOpen}>
-        <DialogContent className='flex flex-col items-center p-10'>
-          {addDevice || devices.length <= 0 ? (
-            <NewDevice
-              getDevices={getDevices}
-              setAddDevice={setAddDevice}
-              existingDevices={devices.length > 0}
-            />
-          ) : (
-            <DeviceManager
-              getDevices={getDevices}
-              setAddDevice={setAddDevice}
-              devices={devices}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
   );
 }
