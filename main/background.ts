@@ -42,6 +42,8 @@ let mainWindow: Electron.BrowserWindow;
     height: 800,
     minWidth: 800,
     minHeight: 600,
+    maxWidth: 1600,
+    maxHeight: 1000,
     titleBarStyle: isDarwin ? 'hidden' : 'default',
     titleBarOverlay: true,
     backgroundColor: isDarkMode ? '#1c1917' : '#fafaf9',
@@ -320,14 +322,29 @@ ipcMain.on('get-update', async (event) => {
 
 ipcMain.on('add-screen', async (event, screen: ScreenInfo) => {
   let screens = store.get('screens', []) as ScreenInfo[];
+
+  if (screens.find((s) => s.id === screen.id)) {
+    screens = screens.filter((s) => s.id !== screen.id); // Remove old screen
+  }
+
   screens.push(screen);
   store.set('screens', screens);
-  event.reply('get-screens-res', screens);
+  event.reply(
+    'get-screens-res',
+    screens.sort(
+      (a, b) => new Date(a.addDate).getTime() - new Date(b.addDate).getTime()
+    )
+  );
 });
 
 ipcMain.on('get-screens', async (event) => {
   const screens = store.get('screens', []) as ScreenInfo[];
-  event.reply('get-screens-res', screens);
+  event.reply(
+    'get-screens-res',
+    screens.sort(
+      (a, b) => new Date(a.addDate).getTime() - new Date(b.addDate).getTime()
+    )
+  );
 });
 
 ipcMain.on('remove-screen', async (event, id) => {

@@ -21,6 +21,11 @@ export default function DevicesTab({
   // Ping devices when the devices list changes
   useEffect(() => {
     devicesRef.current = devices;
+    if (devices.length <= 0) {
+      setHideTabs(true);
+    } else {
+      setHideTabs(false);
+    }
     window.ipc.pingDevices(devicesRef.current);
   }, [devices]);
 

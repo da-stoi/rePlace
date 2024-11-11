@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown';
 import Image from 'next/image';
+import { ScreenCarousel } from '../components/screen-carousel';
 
 function ConnectingModal({
   connected,
@@ -50,9 +51,9 @@ function ConnectingModal({
                 Back
               </Button>
               <Button
-                variant='secondary'
+                variant='default'
                 size='lg'
-                className='mt-6 w-full'
+                className='mt-6 w-full text-background'
                 onClick={retry}
               >
                 Retry
@@ -246,17 +247,17 @@ export default function Connection() {
       <div className='fixed top-0 pl-10 pt-16 w-max mr-10 right-0 flex flex-row'>
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <div className='bg-muted py-2 px-3 flex flex-row gap-2 rounded select-none'>
+            <div className='bg-foreground py-2 px-3 flex flex-row gap-2 rounded select-none'>
               <div
                 className={cn(
                   'size-2.5 rounded-full m-auto',
                   connected
-                    ? 'bg-green-600 dark:bg-green-700'
-                    : 'bg-amber-600 dark:bg-amber-700'
+                    ? 'bg-green-700 dark:bg-green-600'
+                    : 'bg-amber-700 dark:bg-amber-600'
                 )}
               />
 
-              <h3 className='m-auto'>
+              <h3 className='m-auto text-background'>
                 {deviceInfo.displayName || 'reMarkable'}
               </h3>
               {/* <p className='m-auto text-sm'>{deviceInfo.host}</p> */}
@@ -281,6 +282,7 @@ export default function Connection() {
       <div className='flex flex-col items-center mt-32 mx-10'>
         <h1 className='text-3xl font-bold'>Screens</h1>
         <div className='w-full flex flex-row flex-wrap gap-4 mt-6 m-auto'>
+          <ScreenCarousel />
           {screens &&
             screens.length > 0 &&
             screens.map((screen) => (

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '../lib/utils';
 import notify from '../lib/notify';
-import { UpdateDetails } from '../types';
+import { UpdateDetails, UserSettings } from '../types';
 
 export default function StartupAnimation() {
   const [open, setOpen] = useState<boolean>(false);
@@ -27,6 +27,17 @@ export default function StartupAnimation() {
 
   useEffect(() => {
     window.ipc.getUpdate();
+    window.ipc.getUserSettings();
+
+    window.ipc.on('get-user-settings-res', (settings: UserSettings) => {
+      if (settings.skipSplashScreen) {
+        if (window.isProd) {
+          window.location.href = './main.html';
+        } else {
+          window.location.href = './main';
+        }
+      }
+    });
 
     window.ipc.on('get-update-res', (details: UpdateDetails | false) => {
       if (details) {

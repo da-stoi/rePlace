@@ -39,7 +39,7 @@ export default function DeviceManager({
   return (
     <>
       {/* <h1 className='text-2xl text-center'>Your Devices</h1> */}
-      <ScrollArea className='max-h-72 h-fit w-full overflow-y-scroll overflow-x-auto'>
+      <ScrollArea className='max-h-72 h-fit max-w-md w-full overflow-y-scroll overflow-x-auto'>
         <div className='flex flex-col gap-3 my-4 w-full'>
           {devices.map((device, index) => (
             <ContextMenu>
@@ -134,7 +134,7 @@ export default function DeviceManager({
         </div>
       </ScrollArea>
       <Button
-        variant='secondary'
+        variant='outline'
         onClick={() => setAddDevice(true)}
       >
         <Plus className='h-6 w-6' /> Add Device

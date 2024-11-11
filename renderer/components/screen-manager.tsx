@@ -26,10 +26,10 @@ export default function ScreenManager({
       const dataUrl = reader.result as string;
       const screenInfo: ScreenInfo = {
         id: Date.now().toString(),
+        addDate: new Date(),
         name: file.name,
         dataUrl,
       };
-      console.log('ScreenInfo:', screenInfo);
 
       // Add screen to saved screens
       window.ipc.addScreen(screenInfo);
@@ -62,7 +62,7 @@ export default function ScreenManager({
       <ScreenCarousel />
       <div className='flex flex-row gap-2 w-full'>
         <Button
-          variant='secondary'
+          variant='outline'
           className='w-full'
           onClick={() => fileInputRef.current?.click()}
         >
@@ -70,8 +70,8 @@ export default function ScreenManager({
         </Button>
         <Button
           disabled
-          variant='secondary'
-          className='w-full'
+          variant='default'
+          className='w-full text-background'
           onClick={() => handleCreateScreen()}
         >
           <Brush /> Create Screen
