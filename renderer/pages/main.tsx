@@ -34,7 +34,7 @@ export default function Connect() {
             <div
               className={cn('flex flex-row gap-2', hideTabs ? 'hidden' : '')}
             >
-              <TabsList className='w-full'>
+              <TabsList className='w-full filter'>
                 <TabsTrigger
                   value='devices'
                   className='w-full'
@@ -47,6 +47,13 @@ export default function Connect() {
                 >
                   <h1>Screen Manager</h1>
                 </TabsTrigger>
+                {/* <TabsTrigger
+                  value='templates'
+                  className='w-full'
+                  disabled
+                >
+                  <h1>Template Manager</h1>
+                </TabsTrigger> */}
               </TabsList>
               <Button
                 variant='outline'

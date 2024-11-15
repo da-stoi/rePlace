@@ -409,7 +409,7 @@ export default function NewDevice({
                 : '127.0.0.1',
               username: deviceInfo?.connection?.username
                 ? deviceInfo?.connection?.username
-                : 'redockable',
+                : 'root',
               password: deviceInfo?.connection?.password
                 ? deviceInfo?.connection?.password
                 : '',

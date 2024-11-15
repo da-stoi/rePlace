@@ -57,8 +57,16 @@ const handler = {
     ipcRenderer.send('get-files', connection);
   },
   // Upload a file to a reMarkable device
-  uploadFile: async (data: string) => {
-    ipcRenderer.send('upload-file', data);
+  uploadFile: async ({
+    connection,
+    screen,
+    file,
+  }: {
+    connection: Connection;
+    screen: string;
+    file: string;
+  }) => {
+    ipcRenderer.send('upload-file', { connection, screen, file });
   },
   // Ping devices to check if they are alive
   pingDevices: async (devices: DeviceInfo[]) => {

@@ -1,23 +1,27 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { DeviceInfo, DeviceMethod, DeviceType, ScreenFile } from '../types';
-import Header from '../components/header';
+import { DeviceInfo, DeviceMethod, DeviceType, ScreenInfo } from '../types';
 import PageLoader from '../components/page-load';
 import { Dialog, DialogContent } from '../components/ui/dialog';
-import { Cable, Loader2, Wifi } from 'lucide-react';
+import {
+  ChevronsLeftRightEllipsis,
+  FolderInput,
+  Loader2,
+  Redo,
+  Upload,
+  X,
+  XCircle,
+} from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { cn } from '../lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../components/ui/dropdown';
-import Image from 'next/image';
 import { ScreenCarousel } from '../components/screen-carousel';
+import Suspended from '../customTemplates/Suspended';
+import Batteryempty from '../customTemplates/Batteryempty';
+import Overheating from '../customTemplates/Overheating';
+import Poweroff from '../customTemplates/Poweroff';
+import Rebooting from '../customTemplates/Rebooting';
+import Starting from '../customTemplates/Starting';
 
 function ConnectingModal({
   connected,
@@ -35,17 +39,20 @@ function ConnectingModal({
       <DialogContent className='flex flex-col items-center p-10'>
         {connectionFailed ? (
           <>
-            <h1 className='text-3xl font-bold mb-4'>Connection Failed</h1>
+            <div className='mb-4 flex flex-row gap-2'>
+              <XCircle className='m-auto size-8' />
+              <h1 className='text-3xl font-bold'>Connection Failed</h1>
+            </div>
             <p className='text-lg text-center'>
               Failed to connect to your device. Please check that your device is
               on and not on the sleep screen and that your device IP address has
               not changed.
             </p>
-            <div className='w-full flex flex-row gap-3'>
+            <div className='w-full flex flex-row gap-3 mt-6'>
               <Button
                 variant='outline'
                 size='lg'
-                className='mt-6 w-full'
+                className='w-full'
                 onClick={back}
               >
                 Back
@@ -53,7 +60,7 @@ function ConnectingModal({
               <Button
                 variant='default'
                 size='lg'
-                className='mt-6 w-full text-background'
+                className='w-full text-background'
                 onClick={retry}
               >
                 Retry
@@ -62,7 +69,10 @@ function ConnectingModal({
           </>
         ) : (
           <>
-            <h1 className='text-3xl font-bold mb-4'>Connecting...</h1>
+            <div className='mb-4 flex flex-row gap-2'>
+              <ChevronsLeftRightEllipsis className='m-auto size-8' />
+              <h1 className='text-3xl font-bold'>Connecting</h1>
+            </div>
             <div className='flex items-center justify-center'>
               <Loader2 className='size-12 animate-spin' />
             </div>
@@ -89,7 +99,13 @@ export default function Connection() {
   const [retryCount, setRetryCount] = useState<number>(0);
   const [connected, setConnected] = useState<boolean>(false);
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
-  const [screens, setScreens] = useState<ScreenFile[]>([]);
+  const [savedScreens, setSavedScreens] = useState<ScreenInfo[]>([]);
+  const [remoteScreens, setRemoteScreens] = useState<ScreenInfo[]>([]);
+  const [selectedSavedScreen, setSelectedSavedScreen] =
+    useState<ScreenInfo | null>(null);
+  const [selectedRemoteScreen, setSelectedRemoteScreen] =
+    useState<ScreenInfo | null>(null);
+  const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
 
   const heartbeatIntervalRef = useRef(heartbeatInterval);
   const connectionFailedRef = useRef(connectionFailed);
@@ -127,6 +143,12 @@ export default function Connection() {
       return;
     }
 
+    // Get saved screens
+    window.ipc.getScreens();
+    window.ipc.on('get-screens-res', (screens: ScreenInfo[]) => {
+      setSavedScreens(screens);
+    });
+
     // Start ipc event listeners
     window.ipc.on('connect-device-res', (res: { connected: boolean }) => {
       setConnected(res.connected);
@@ -149,8 +171,8 @@ export default function Connection() {
       }
     });
 
-    window.ipc.on('get-files-res', (res: ScreenFile[]) => {
-      setScreens(res);
+    window.ipc.on('get-files-res', (res: ScreenInfo[]) => {
+      setRemoteScreens(res);
     });
 
     setDeviceInfo({
@@ -226,11 +248,26 @@ export default function Connection() {
   };
 
   const getFiles = async () => {
+    console.log('getfile', deviceInfo);
     if (!deviceInfo) {
       return;
     }
 
     window.ipc.getFiles(deviceInfo.connection);
+  };
+
+  const uploadScreen = async () => {
+    if (!deviceInfo || !selectedSavedScreen || !selectedRemoteScreen) {
+      return;
+    }
+
+    window.ipc.uploadFile({
+      connection: deviceInfo.connection,
+      screen: selectedRemoteScreen.name.split('.png')[0],
+      file: selectedSavedScreen.dataUrl,
+    });
+
+    setShowUploadModal(false);
   };
 
   useEffect(() => {
@@ -243,68 +280,170 @@ export default function Connection() {
   }
 
   return (
-    <div className='mt-20'>
+    <div className='mt-20 h-full'>
       <div className='fixed top-0 pl-10 pt-16 w-max mr-10 right-0 flex flex-row'>
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <div className='bg-foreground py-2 px-3 flex flex-row gap-2 rounded select-none'>
-              <div
-                className={cn(
-                  'size-2.5 rounded-full m-auto',
-                  connected
-                    ? 'bg-green-700 dark:bg-green-600'
-                    : 'bg-amber-700 dark:bg-amber-600'
-                )}
-              />
+        <div className='flex flex-row gap-2'>
+          <Button
+            variant='default'
+            className='text-background hover:bg-foreground cursor-default'
+          >
+            <div
+              className={cn(
+                'size-2.5 rounded-full m-auto',
+                connected
+                  ? 'bg-green-700 dark:bg-green-600'
+                  : 'bg-amber-700 dark:bg-amber-600'
+              )}
+            />
 
-              <h3 className='m-auto text-background'>
-                {deviceInfo.displayName || 'reMarkable'}
-              </h3>
-              {/* <p className='m-auto text-sm'>{deviceInfo.host}</p> */}
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>
-              {connected ? 'Connected' : 'Disconnected'}
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className='text-destructive'
-              onClick={disconnectDevice}
-            >
-              Disconnect
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {/* <Button></Button> */}
-      </div>
-
-      <div className='flex flex-col items-center mt-32 mx-10'>
-        <h1 className='text-3xl font-bold'>Screens</h1>
-        <div className='w-full flex flex-row flex-wrap gap-4 mt-6 m-auto'>
-          <ScreenCarousel />
-          {screens &&
-            screens.length > 0 &&
-            screens.map((screen) => (
-              <div
-                key={screen.name}
-                className='m-auto'
-              >
-                <Image
-                  src={`${screen.dataUrl}`}
-                  alt={screen.name}
-                  className='rounded-md'
-                  width={220}
-                  height={280}
-                />
-              </div>
-            ))}
-
-          {screens.length === 0 && (
-            <h3 className='text-xl text-center'>No screens found</h3>
-          )}
+            <h3 className='m-auto text-background'>
+              {deviceInfo.displayName || 'reMarkable'}
+            </h3>
+          </Button>
+          <Button
+            size='icon'
+            variant='destructive'
+            onClick={disconnectDevice}
+          >
+            <X />
+          </Button>
         </div>
       </div>
+
+      <div className='flex flex-col items-center mt-32 mx-10 h-full'>
+        <div className='w-full flex flex-row flex-wrap mt-6 m-auto justify-around'>
+          <div className='w-full max-w-[calc(50vw_-_15rem)]'>
+            <h1 className='text-2xl font-bold text-center'>Saved Screens</h1>
+            <ScreenCarousel
+              className='w-full max-w-[calc(50vw_-_15rem)]'
+              screens={savedScreens}
+              onSelect={setSelectedSavedScreen}
+              titlePosition={'top'}
+              showTitle={true}
+              editableTitle={false}
+              showDeleteButton={false}
+              showDownloadButton={false}
+              showScreenCountBar={false}
+            />
+          </div>
+
+          {/* Center graphic */}
+          <div className='w-min my-auto'>
+            <Redo className='size-16 animate-fade-and-scale-in' />
+          </div>
+
+          <div className='w-full max-w-[calc(50vw_-_15rem)] my-auto'>
+            <h1 className='text-2xl font-bold text-center'>
+              {deviceInfo.displayName || 'Device'} Screens
+            </h1>
+            {remoteScreens && remoteScreens.length > 0 ? (
+              <ScreenCarousel
+                className='w-full max-w-[calc(50vw_-_15rem)]'
+                screens={
+                  remoteScreens
+                    ? (remoteScreens.map((screen) => ({
+                        id: screen.name,
+                        name: screen.name,
+                        dataUrl: screen.dataUrl,
+                        addDate: new Date(),
+                      })) as ScreenInfo[])
+                    : []
+                }
+                onSelect={setSelectedRemoteScreen}
+                titlePosition={'top'}
+                showTitle={true}
+                editableTitle={false}
+                showDeleteButton={false}
+                showDownloadButton={false}
+                showScreenCountBar={false}
+              />
+            ) : (
+              <div className='flex flex-col items-center gap-4 w-full max-w-[calc(50vw_-_15rem)] my-auto'>
+                <h1 className='text-2xl font-bold'>
+                  Unable to get device screens
+                </h1>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Upload button */}
+      <Button
+        className='text-background fixed bottom-5 left-1/2 -translate-x-1/2'
+        onClick={() => setShowUploadModal(true)}
+        disabled={
+          !connected ||
+          connectionFailed ||
+          !selectedSavedScreen ||
+          !selectedRemoteScreen
+        }
+      >
+        <FolderInput /> Update Screen
+      </Button>
+
+      {/* Confirm upload modal */}
+      <Dialog
+        open={showUploadModal}
+        onOpenChange={(open) => setShowUploadModal(open)}
+      >
+        <DialogContent className='flex flex-col items-center p-10'>
+          <div className='mb-4 flex flex-row gap-2'>
+            <Upload className='m-auto size-8' />
+            <h1 className='text-3xl font-bold'>Update Screen</h1>
+          </div>
+          <p className='text-lg text-center'>
+            Are you sure you want to upload a screen to your device? This will
+            overwrite the current screen on your device. Make sure to back up
+            your current screen if you want to keep it.
+          </p>
+          <div className='w-full flex flex-row gap-3 mt-6'>
+            <Button
+              variant='outline'
+              className='w-full'
+              onClick={() => setShowUploadModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant='default'
+              className='w-full text-background'
+              onClick={uploadScreen}
+            >
+              Update Screen
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* <Suspended
+        theme={'light'}
+        lostText={''}
+        contactInfo={[]}
+        download={false}
+      />
+      <Batteryempty
+        theme={'light'}
+        download={false}
+      />
+      <Overheating
+        theme={'light'}
+        download={false}
+      />
+      <Poweroff
+        theme={'light'}
+        download={false}
+        lostText={''}
+        contactInfo={[]}
+      />
+      <Rebooting
+        theme={'light'}
+        download={false}
+      />
+      <Starting
+        theme={'light'}
+        download={false}
+      /> */}
 
       {/* Connecting modal */}
       <ConnectingModal

@@ -2,7 +2,6 @@ import path from 'path';
 import { app, ipcMain, shell, Notification } from 'electron';
 import serve from 'electron-serve';
 import { createWindow } from './helpers';
-import fs from 'fs';
 import Client from 'ssh2-sftp-client';
 import { nativeTheme } from 'electron';
 import {
@@ -249,11 +248,11 @@ ipcMain.on('get-files', async (event, connection) => {
       })
       .sort((a, b) => a.localeCompare(b));
 
-    const images = await Promise.all(
+    const images: ScreenInfo[] = await Promise.all(
       fileNames.map(async (fileName) => {
         const image = await sftp.get(`/usr/share/remarkable/${fileName}`);
         const dataUrl = `data:image/png;base64,${image.toString('base64')}`;
-        return { name: fileName, dataUrl };
+        return { id: fileName, name: fileName, dataUrl, addDate: new Date() };
       })
     );
 
@@ -285,13 +284,14 @@ ipcMain.on('upload-file', async (event, { connection, screen, file }) => {
     );
     await sftp.put(buffer, `/usr/share/remarkable/${screen}.png`);
 
-    sftp.end();
+    // Get updated files
+    ipcMain.emit('get-files', event, connection);
+
     event.reply('upload-file', { success: true });
     return { success: true };
   } catch (err) {
     event.reply('log', err);
     console.log('Failed to upload file:', err);
-    sftp.end();
 
     event.reply('upload-file-res', { error: 'Could not upload file' });
     return { error: 'Could not upload file' };

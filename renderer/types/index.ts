@@ -1,8 +1,3 @@
-type ScreenFile = {
-  name: string;
-  dataUrl: string;
-};
-
 type Connection = {
   host: string;
   port: number;
@@ -35,7 +30,7 @@ type CustomizableScreenProps = {
 
 type CurrentScreensProps = {
   connection: Connection | null;
-  files: ScreenFile[];
+  files: ScreenInfo[];
   updateConnection: Function;
   setFiles: Function;
   getFiles: Function;
@@ -111,7 +106,6 @@ type ScreenInfo = {
 
 // Export
 export type {
-  ScreenFile,
   Connection,
   StaticScreenProps,
   CustomInfo,

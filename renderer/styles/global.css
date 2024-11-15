@@ -51,6 +51,10 @@ html {
   }
 
   :root {
+
+    --header-font-family: 'Lora', serif;
+    --body-font-family: 'Open Sans', sans-serif;
+
     --background: 60 9.1% 97.8%;
     --foreground: 24 9.8% 10%;
 

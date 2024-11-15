@@ -218,8 +218,8 @@ export default function Settings() {
         </h1>
         <div className='ml-6'>
           <p className='my-2'>
-            Enable developer mode to access advanced features needed for
-            development.
+            Enable developer mode to access features needed for development and
+            advanced configurations.
           </p>
           <div className='mt-5 flex flex-row gap-2'>
             <Switch

@@ -1,8 +1,7 @@
-import { Brush, Plus, Upload } from 'lucide-react';
+import { Brush, Upload } from 'lucide-react';
 import { ScreenInfo } from '../types';
 import { Button } from './ui/button';
-import { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import { ScreenCarousel } from './screen-carousel';
 
 export default function ScreenManager({
@@ -10,11 +9,20 @@ export default function ScreenManager({
 }: {
   setHideTabs: (hideTabs: boolean) => void;
 }) {
+  const [screens, setScreens] = useState<ScreenInfo[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    window.ipc.getScreens();
+
+    // Listen for screens response
+    window.ipc.on('get-screens-res', (screens: ScreenInfo[]) => {
+      setScreens(screens);
+    });
+  }, []);
 
   const handleFileUpload = async (file: File) => {
     const imageDimensions = await getImageDimensions(file);
-    console.log('Image dimensions:', imageDimensions);
 
     if (imageDimensions.width !== 1404 || imageDimensions.height !== 1872) {
       alert('reMarkable screens must be exactly 1404x1872.');
@@ -59,7 +67,7 @@ export default function ScreenManager({
     <>
       {/* <h1 className='text-2xl text-center'>Screen Manager</h1> */}
 
-      <ScreenCarousel />
+      <ScreenCarousel screens={screens} />
       <div className='flex flex-row gap-2 w-full'>
         <Button
           variant='outline'
