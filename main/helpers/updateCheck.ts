@@ -22,13 +22,14 @@ export default async function checkForAppUpdate(
   const lastCheck = store.get('lastUpdateCheck', 0) as number;
 
   const now = Date.now();
-  if (lastCheck && now - lastCheck < 1000 * 60 * 60 * 6) {
+  if (lastCheck && now - lastCheck < 1000 * 60 * 60 * 3) {
+    // 3 hours
     return lastFetchedUpdate;
   }
 
   // Fetch latest release from GitHub
   const updateRes = await fetch(
-    'https://api.github.com/repos/da-stoi/canvas-class-average/releases'
+    'https://api.github.com/repos/da-stoi/rePlace/releases'
   );
   let updateDataArray = await updateRes.json();
 
