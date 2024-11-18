@@ -112,7 +112,7 @@ export default function DeviceManager({
                       }&method=${device.method}`)
                     }
                   >
-                    Connect
+                    <h3>Connect</h3>
                   </Button>
                 </div>
               </ContextMenuTrigger>

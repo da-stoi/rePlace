@@ -4,8 +4,11 @@ import { useEffect, useRef, useState } from 'react';
 import { cn } from '../lib/utils';
 import notify from '../lib/notify';
 import { UpdateDetails, UserSettings } from '../types';
+import { useTheme } from 'next-themes';
 
 export default function StartupAnimation() {
+  const { setTheme } = useTheme();
+
   const [open, setOpen] = useState<boolean>(false);
   const [animationComplete, setAnimationComplete] = useState<boolean>(false);
 
@@ -30,6 +33,12 @@ export default function StartupAnimation() {
     window.ipc.getUserSettings();
 
     window.ipc.on('get-user-settings-res', (settings: UserSettings) => {
+      if (settings.theme) {
+        setTheme(settings.theme);
+      } else {
+        setTheme('system');
+      }
+
       if (settings.skipSplashScreen) {
         if (window.isProd) {
           window.location.href = './main.html';

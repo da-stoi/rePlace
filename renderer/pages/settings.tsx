@@ -27,8 +27,16 @@ import {
   SkipForward,
   Sparkles,
   SquareCode,
+  Sun,
   SunMoon,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../components/ui/dropdown';
+import { useTheme } from 'next-themes';
 
 function DownloadUpdate({ updateDetails }: { updateDetails: UpdateDetails }) {
   if (!updateDetails) {
@@ -92,12 +100,16 @@ function DownloadUpdate({ updateDetails }: { updateDetails: UpdateDetails }) {
 }
 
 export default function Settings() {
+  const { setTheme, theme } = useTheme();
+  const [isClient, setIsClient] = useState(false);
+
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const [updateDetails, setUpdateDetails] = useState<UpdateDetails | null>(
     null
   );
 
   useEffect(() => {
+    setIsClient(true);
     window.ipc.getUpdate();
     window.ipc.getUserSettings();
 
@@ -130,7 +142,7 @@ export default function Settings() {
               window.location.href = `/main${window.isProd ? '.html' : ''}`;
             }}
           >
-            <ChevronLeft /> Back
+            <ChevronLeft /> <h3>Back</h3>
           </Button>
         </div>
 
@@ -147,6 +159,42 @@ export default function Settings() {
           <p className='my-2'>
             Choose between light and dark themes for the app.
           </p>
+          {isClient && theme && (
+            <DropdownMenu>
+              {/* Capitalize first letter */}
+              <DropdownMenuTrigger>
+                <Button className='text-background'>
+                  <h3>{theme[0].toUpperCase() + theme.slice(1)}</h3>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setTheme('dark');
+                    window.ipc.updateUserSetting('theme', 'dark');
+                  }}
+                >
+                  Dark
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setTheme('light');
+                    window.ipc.updateUserSetting('theme', 'light');
+                  }}
+                >
+                  Light
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setTheme('system');
+                    window.ipc.updateUserSetting('theme', 'system');
+                  }}
+                >
+                  System
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           <hr className='my-4' />
 

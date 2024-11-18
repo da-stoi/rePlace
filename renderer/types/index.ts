@@ -77,6 +77,7 @@ type DeviceInfo = {
 };
 
 type UserSettings = {
+  theme: 'dark' | 'light' | 'system'; // The user's theme
   skipSplashScreen: boolean; // If the user wants to see the splash screen
   preRelease: boolean; // If the user wants to receive pre-release updates
   developerMode: boolean; // If the user wants to enable developer mode
