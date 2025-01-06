@@ -1,71 +1,71 @@
-import { Wifi, Cable, Container, Plus } from 'lucide-react';
-import { cn } from '../lib/utils';
-import { DeviceInfo } from '../types';
-import { Button } from './ui/button';
+import React from 'react'
+import { Wifi, Cable, Container, Plus } from 'lucide-react'
+import { cn } from '../lib/utils'
+import { DeviceInfo } from '../types'
+import { Button } from './ui/button'
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuLabel,
   ContextMenuSeparator,
-  ContextMenuTrigger,
-} from './ui/context-menu';
-import { ScrollArea } from './ui/scroll-area';
+  ContextMenuTrigger
+} from './ui/context-menu'
+import { ScrollArea } from './ui/scroll-area'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
-} from './ui/tooltip';
+  TooltipTrigger
+} from './ui/tooltip'
 
 export default function DeviceManager({
   devices,
   aliveHosts,
   handleAddOrEditDevice,
   getDevices,
-  setAddDevice,
+  setAddDevice
 }: {
-  devices: DeviceInfo[];
-  aliveHosts: string[];
-  handleAddOrEditDevice: (existingDevice: DeviceInfo) => void;
-  getDevices: () => void;
-  setAddDevice: (addDevice: boolean) => void;
+  devices: DeviceInfo[]
+  aliveHosts: string[]
+  handleAddOrEditDevice: (existingDevice: DeviceInfo) => void
+  getDevices: () => void
+  setAddDevice: (addDevice: boolean) => void
 }) {
   const removeDevice = (id: string) => {
-    window.ipc?.send('remove-device', id);
-    getDevices();
-  };
+    window.ipc?.send('remove-device', id)
+    getDevices()
+  }
 
   return (
     <>
       {/* <h1 className='text-2xl text-center'>Your Devices</h1> */}
-      <ScrollArea className='max-h-72 h-fit max-w-md w-full overflow-y-scroll overflow-x-auto'>
-        <div className='flex flex-col gap-3 my-4 w-full'>
+      <ScrollArea className="h-fit max-h-72 w-full max-w-md overflow-x-auto overflow-y-scroll">
+        <div className="my-4 flex w-full flex-col gap-3">
           {devices.map((device, index) => (
-            <ContextMenu>
+            <ContextMenu key={index}>
               <ContextMenuTrigger>
                 <div
                   key={device.connection.host}
-                  className='flex flex-row gap-2 border p-2 rounded-lg mx-1'
-                >
+                  className="mx-1 flex flex-row gap-2 rounded-lg border p-2">
                   {/* Connection method icon */}
                   {device.method === 'wifi' && (
-                    <Wifi className='size-10 mx-3 m-auto' />
+                    <Wifi className="m-auto mx-3 size-10" />
                   )}
                   {device.method === 'usb' && (
-                    <Cable className='size-10 mx-3 m-auto' />
+                    <Cable className="m-auto mx-3 size-10" />
                   )}
                   {device.method === 'redockable' && (
-                    <Container className='size-10 mx-3 m-auto' />
+                    <Container className="m-auto mx-3 size-10" />
                   )}
 
                   {/* Main device content */}
-                  <div className='flex flex-col w-full gap-1'>
-                    <h1 className='text-lg inline'>{device.displayName}</h1>
-                    <div className='flex flex-row gap-2'>
+                  <div className="flex w-full flex-col gap-1">
+                    <h1 className="inline text-lg">{device.displayName}</h1>
+                    <div className="flex flex-row gap-2">
                       <TooltipProvider>
                         <Tooltip>
-                          <TooltipTrigger className='inline'>
+                          <TooltipTrigger className="inline">
                             <div
                               className={cn(
                                 'size-3 rounded-full',
@@ -84,34 +84,31 @@ export default function DeviceManager({
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                      <p className='text-muted-foreground text-sm justify-self-stretch'>
+                      <p className="text-muted-foreground justify-self-stretch text-sm">
                         {device.type === 'rm1'
                           ? 'rM 1'
                           : device.type === 'rm2'
-                          ? 'rM 2'
-                          : device.type === 'rmpro'
-                          ? 'rM Pro'
-                          : device.type === 'redockable'
-                          ? 'reDockable'
-                          : 'Unknown Device'}{' '}
+                            ? 'rM 2'
+                            : device.type === 'rmpro'
+                              ? 'rM Pro'
+                              : device.type === 'redockable'
+                                ? 'reDockable'
+                                : 'Unknown Device'}{' '}
                         | {device.connection.host}
                       </p>
                     </div>
                   </div>
                   <Button
-                    className='m-auto mr-3 text-background'
+                    className="text-background m-auto mr-3"
                     onClick={() =>
-                      (window.location.href = `/connection${
-                        window.isProd ? '.html' : ''
-                      }?host=${device.connection.host}&port=${
+                      (window.location.href = `/connection?host=${device.connection.host}&port=${
                         device.connection.port
                       }&username=${device.connection.username}&password=${
                         device.connection.password
                       }&displayName=${device.displayName}&type=${
                         device.type
                       }&method=${device.method}`)
-                    }
-                  >
+                    }>
                     <h3>Connect</h3>
                   </Button>
                 </div>
@@ -123,9 +120,8 @@ export default function DeviceManager({
                   Edit
                 </ContextMenuItem>
                 <ContextMenuItem
-                  className='text-destructive'
-                  onClick={() => removeDevice(device.id)}
-                >
+                  className="text-destructive"
+                  onClick={() => removeDevice(device.id)}>
                   Remove
                 </ContextMenuItem>
               </ContextMenuContent>
@@ -134,11 +130,10 @@ export default function DeviceManager({
         </div>
       </ScrollArea>
       <Button
-        variant='outline'
-        onClick={() => setAddDevice(true)}
-      >
-        <Plus className='h-6 w-6' /> Add Device
+        variant="outline"
+        onClick={() => setAddDevice(true)}>
+        <Plus className="size-6" /> Add Device
       </Button>
     </>
-  );
+  )
 }

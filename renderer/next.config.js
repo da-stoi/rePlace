@@ -1,15 +1,12 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
+module.exports = {
   output: 'export',
-  distDir: '../app',
+  distDir: process.env.NODE_ENV === 'production' ? '../app' : '.next',
+  trailingSlash: true,
   images: {
-    unoptimized: true,
+    unoptimized: true
   },
-  webpack: (config) => {
-    return config;
-  },
-};
-
-module.exports = nextConfig;
+  webpack: config => {
+    return config
+  }
+}

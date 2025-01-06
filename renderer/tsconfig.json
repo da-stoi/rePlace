@@ -1,10 +1,16 @@
 {
   "extends": "../tsconfig.json",
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "../main/helpers/updateCheck.ts"
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    "../dist/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
 }

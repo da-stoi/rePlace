@@ -23,14 +23,14 @@ mac:
 dmg:
   sign: false
   icon: 'resources/icon.png'
-  # background: "resources/dmg-background.png"
+  background: 'resources/dmg-background.tiff'
   contents:
-    - x: 130
-      y: 220
+    - x: 410
+      y: 180
       type: link
       path: /Applications
-    - x: 410
-      y: 220
+    - x: 130
+      y: 180
       type: file
 
 win:
@@ -55,5 +55,5 @@ linux:
   category: Utility
   synopsis: 'A cross-platform application by Daniel Stoiber'
   description: 'rePlace is an application designed to perform efficient cross-platform operations.'
-  maintainer: 'Daniel Stoiber <contact@example.com>'
+  maintainer: 'Daniel Stoiber <replace@stoiber.network>'
   icon: 'resources/icon.png'

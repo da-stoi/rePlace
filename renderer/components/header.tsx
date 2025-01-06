@@ -1,12 +1,14 @@
+import React from 'react'
+
 export default function Header() {
   return (
-    <div className='titlebar fixed top-0 py-4 w-full flex justify-center bg-background'>
-      <div className='space-x-2'>
-        <div className='inline-flex bg-foreground size-8 rounded-md items-center justify-center'>
-          <h1 className='text-background font-bold text-xl text-center'>rP</h1>
+    <div className="titlebar bg-background fixed top-0 flex w-full justify-center py-4">
+      <div className="space-x-2">
+        <div className="bg-foreground inline-flex size-8 items-center justify-center rounded-md">
+          <h1 className="text-background text-center text-xl font-bold">rP</h1>
         </div>
-        <h1 className='inline text-2xl h-8'>rePlace</h1>
+        <h1 className="inline h-8 text-2xl">rePlace</h1>
       </div>
     </div>
-  );
+  )
 }

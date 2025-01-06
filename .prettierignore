@@ -1,0 +1,5 @@
+*.md
+*.mdx
+.next
+node_modules
+dist
