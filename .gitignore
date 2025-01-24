@@ -10,6 +10,7 @@ next-env.d.ts
 
 # build
 app
+!renderer/app
 dist
 
 # misc

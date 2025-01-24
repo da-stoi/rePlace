@@ -1,12 +1,12 @@
 import React from 'react'
-import { DeviceInfo, UserSettings, HostStatus } from '../types'
+import { DeviceInfo, UserSettings, HostStatus } from '../../types'
 import NewDevice from './new-device'
-import DeviceManager from './device-manager'
+import DeviceList from './device-list'
 
-export default function DevicesTab({
-  setHideTabs
+export default function DeviceManager({
+  setHideHeader
 }: {
-  setHideTabs: (hideTabs: boolean) => void
+  setHideHeader: (hideHeader: boolean) => void
 }) {
   const [devices, setDevices] = React.useState<DeviceInfo[]>([])
   const [aliveHosts, setAliveHosts] = React.useState<string[]>([])
@@ -24,9 +24,9 @@ export default function DevicesTab({
   React.useEffect(() => {
     devicesRef.current = devices
     if (devices.length <= 0) {
-      setHideTabs(true)
+      setHideHeader(true)
     } else {
-      setHideTabs(false)
+      setHideHeader(false)
     }
     window.ipc.pingDevices(devicesRef.current)
   }, [devices])
@@ -35,9 +35,9 @@ export default function DevicesTab({
   React.useEffect(() => {
     if (!addDevice) {
       setEditingDevice({})
-      setHideTabs(false)
+      setHideHeader(false)
     } else {
-      setHideTabs(true)
+      setHideHeader(true)
     }
   }, [addDevice])
 
@@ -90,7 +90,7 @@ export default function DevicesTab({
     )
   } else {
     return (
-      <DeviceManager
+      <DeviceList
         getDevices={getDevices}
         handleAddOrEditDevice={handleDeviceAddOrEdit}
         devices={devices}

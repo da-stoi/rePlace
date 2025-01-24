@@ -3,9 +3,10 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "../dist/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    "../dist/types/**/*.ts"
+    "../app/types/**/*.ts"
   ],
   "exclude": ["node_modules"],
   "compilerOptions": {

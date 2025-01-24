@@ -1,16 +1,16 @@
 import React from 'react'
 import { Wifi, Cable, Eye, EyeOff } from 'lucide-react'
-import { cn } from '../lib/utils'
-import { DeviceInfo, DeviceType, DeviceMethod, Connection } from '../types'
-import { Button } from './ui/button'
-import { Input } from './ui/input'
+import { cn } from '../../lib/utils'
+import { DeviceInfo, DeviceType, DeviceMethod, Connection } from '../../types'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from './ui/tooltip'
-import { Label } from './ui/label'
+} from '../ui/tooltip'
+import { Label } from '../ui/label'
 
 // Step 0: Select device type
 function DeviceSelector({
@@ -31,7 +31,7 @@ function DeviceSelector({
       <h1 className="text-center text-2xl">
         What type of device are you connecting to?
       </h1>
-      <div className="my-5 flex flex-row gap-4">
+      <div className="m-auto my-5 flex flex-row gap-4">
         <Button
           variant="outline"
           className={cn('size-28', deviceInfo.type === 'rm1' && 'outline')}
@@ -54,7 +54,10 @@ function DeviceSelector({
       {developerMode && (
         <Button
           variant="outline"
-          className={cn('p-8', deviceInfo.type === 'redockable' && 'outline')}
+          className={cn(
+            'm-auto w-fit p-8',
+            deviceInfo.type === 'redockable' && 'outline'
+          )}
           onClick={() => handleDeviceSelect('redockable')}>
           <h1 className="text-xl">reDockable</h1>
         </Button>
@@ -63,7 +66,7 @@ function DeviceSelector({
         <Button
           variant="secondary"
           onClick={cancel}
-          className="mt-5">
+          className="m-auto w-fit">
           Cancel
         </Button>
       )}
@@ -108,6 +111,7 @@ function ConnectionMethodSelector({
       </div>
       <Button
         variant="secondary"
+        className="m-auto w-fit"
         onClick={back}>
         Back
       </Button>
@@ -254,7 +258,7 @@ function ConnectionDetails({
           Where do I find this?
         </span>
       </div>
-      <div className="space-x-2">
+      <div className="m-auto space-x-2">
         <Button
           variant="secondary"
           onClick={back}>
@@ -315,7 +319,7 @@ function SaveDevice({
         />
       </div>
       <span
-        className="text-muted-foreground mb-4 cursor-pointer select-none underline hover:no-underline"
+        className="text-muted-foreground mb-4 cursor-pointer select-none text-center underline hover:no-underline"
         onClick={() => {
           window.location.href = `/connection?host=${deviceInfo?.connection?.host}&port=${
             deviceInfo?.connection?.port
@@ -327,7 +331,7 @@ function SaveDevice({
         }}>
         Connect without saving
       </span>
-      <div className="space-x-2">
+      <div className="m-auto space-x-2">
         <Button
           variant="secondary"
           onClick={back}>
@@ -470,7 +474,7 @@ export default function NewDevice({
   }
 
   return (
-    <>
+    <div className="m-auto flex flex-col">
       {/* <code>{JSON.stringify(deviceInfo, null, 2)}</code> */}
       {currentStep === 0 && (
         <DeviceSelector
@@ -505,6 +509,6 @@ export default function NewDevice({
           back={back}
         />
       )}
-    </>
+    </div>
   )
 }

@@ -1,8 +1,8 @@
 import React from 'react'
 import { Wifi, Cable, Container, Plus } from 'lucide-react'
-import { cn } from '../lib/utils'
-import { DeviceInfo } from '../types'
-import { Button } from './ui/button'
+import { cn } from '../../lib/utils'
+import { DeviceInfo } from '../../types'
+import { Button } from '../ui/button'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -10,16 +10,16 @@ import {
   ContextMenuLabel,
   ContextMenuSeparator,
   ContextMenuTrigger
-} from './ui/context-menu'
-import { ScrollArea } from './ui/scroll-area'
+} from '../ui/context-menu'
+import { ScrollArea } from '../ui/scroll-area'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from './ui/tooltip'
+} from '../ui/tooltip'
 
-export default function DeviceManager({
+export default function DeviceList({
   devices,
   aliveHosts,
   handleAddOrEditDevice,
@@ -38,8 +38,7 @@ export default function DeviceManager({
   }
 
   return (
-    <>
-      {/* <h1 className='text-2xl text-center'>Your Devices</h1> */}
+    <div className="m-auto flex flex-col">
       <ScrollArea className="h-fit max-h-72 w-full max-w-md overflow-x-auto overflow-y-scroll">
         <div className="my-4 flex w-full flex-col gap-3">
           {devices.map((device, index) => (
@@ -131,9 +130,10 @@ export default function DeviceManager({
       </ScrollArea>
       <Button
         variant="outline"
+        className="m-auto mt-4"
         onClick={() => setAddDevice(true)}>
         <Plus className="size-6" /> Add Device
       </Button>
-    </>
+    </div>
   )
 }
