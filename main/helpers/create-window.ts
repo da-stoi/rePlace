@@ -1,9 +1,6 @@
-import {
-  screen,
-  BrowserWindow,
-  BrowserWindowConstructorOptions,
-  Rectangle
-} from 'electron'
+import type { WindowState } from '@/types'
+import type { BrowserWindowConstructorOptions, Rectangle } from 'electron'
+import { screen, BrowserWindow } from 'electron'
 import Store from 'electron-store'
 
 export const createWindow = (
@@ -19,7 +16,14 @@ export const createWindow = (
   }
   let state = {}
 
-  const restore = () => store.get(key, defaultSize)
+  const restore = () => {
+    return {
+      ...defaultSize,
+      x: 0,
+      y: 0,
+      ...store.get(key, defaultSize)
+    }
+  }
 
   const getCurrentPosition = () => {
     const position = win.getPosition()
@@ -32,7 +36,10 @@ export const createWindow = (
     }
   }
 
-  const windowWithinBounds = (windowState, bounds) => {
+  const windowWithinBounds = (
+    windowState: WindowState,
+    bounds: Electron.Rectangle
+  ) => {
     return (
       windowState.x >= bounds.x &&
       windowState.y >= bounds.y &&
@@ -49,10 +56,14 @@ export const createWindow = (
     })
   }
 
-  const ensureVisibleOnSomeDisplay = windowState => {
-    const visible = screen.getAllDisplays().some(display => {
-      return windowWithinBounds(windowState, display.bounds)
-    })
+  const ensureVisibleOnSomeDisplay = (
+    windowState: WindowState
+  ): WindowState => {
+    const visible = screen
+      .getAllDisplays()
+      .some((display: Electron.Display) => {
+        return windowWithinBounds(windowState, display.bounds)
+      })
     if (!visible) {
       // Window is partially or fully not visible now.
       // Reset it to safe defaults.

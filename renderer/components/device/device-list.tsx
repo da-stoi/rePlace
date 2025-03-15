@@ -1,7 +1,7 @@
 import React from 'react'
 import { Wifi, Cable, Container, Plus } from 'lucide-react'
 import { cn } from '../../lib/utils'
-import { DeviceInfo } from '../../types'
+import type { DeviceInfo } from '../../types'
 import { Button } from '../ui/button'
 import {
   ContextMenu,

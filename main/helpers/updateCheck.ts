@@ -1,9 +1,9 @@
-import { Asset, UpdateDetails } from '../../renderer/types'
+import type { Asset, UpdateData, UpdateDetails } from '../../renderer/types'
 import { store } from '../background'
 import 'dotenv/config'
 
-function platformFromAsset(asset: any): string | null {
-  // Something with asset.content_type
+function platformFromAsset(asset: Asset): string | null {
+  console.log(asset.platform)
 
   return 'darwin'
 }
@@ -13,7 +13,7 @@ export default async function checkForAppUpdate(
 ): Promise<UpdateDetails | false> {
   let updateAvailable = false
   let updateDetails: UpdateDetails
-  let platform = process.platform
+  const platform = process.platform
   const currentVersion = process.env.RELEASE_TAG
   const lastFetchedUpdate = store.get('latestUpdate', false) as
     | UpdateDetails
@@ -31,7 +31,7 @@ export default async function checkForAppUpdate(
   const updateRes = await fetch(
     'https://api.github.com/repos/da-stoi/rePlace/releases'
   )
-  let updateDataArray = await updateRes.json()
+  let updateDataArray: UpdateData[] = await updateRes.json()
 
   if (!Array.isArray(updateDataArray)) {
     console.error('Failed to fetch update data')
@@ -39,19 +39,19 @@ export default async function checkForAppUpdate(
   }
 
   updateDataArray = updateDataArray.filter(
-    (release: any) => release.draft === false
+    (release: UpdateData) => release.draft === false
   ) // Filter out drafts
 
   // If pre-release is disabled, filter out pre-releases
   if (!preRelease) {
     updateDataArray = updateDataArray.filter(
-      (release: any) => release.prerelease === false
+      (release: UpdateData) => release.prerelease === false
     )
   }
 
   const updateData = updateDataArray[0] // Get latest release
 
-  const latestVersion = updateData.tag_name
+  const latestVersion = updateData?.tag_name
 
   // Check if update is available
   if (currentVersion !== latestVersion && updateData.draft === false) {
@@ -60,7 +60,7 @@ export default async function checkForAppUpdate(
     const assets: Asset[] = updateData.assets
       .map((asset: Asset) => ({
         platform: platformFromAsset(asset),
-        browser_download_url: asset.browser_download_url
+        browserDownloadUrl: asset.browser_download_url
       }))
       .filter((asset: Asset) => asset.platform !== null)
 

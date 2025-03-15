@@ -1,8 +1,8 @@
 import React from 'react'
-import { ScreenInfo } from '../../types'
+import type { ScreenInfo } from '../../types'
 import { cn } from '../../lib/utils'
+import type { CarouselApi } from '../ui/carousel'
 import {
-  CarouselApi,
   Carousel,
   CarouselContent,
   CarouselItem,

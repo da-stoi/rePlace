@@ -1,6 +1,6 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { ScreenInfo } from '@/types'
+import type { ScreenInfo } from '@/types'
 import { Save, Download, Trash } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -46,12 +46,12 @@ export function ScreenPreviewListItem({
       <div className="flex flex-row place-content-center gap-4">
         <div className="basis-1/4 place-self-end">
           <Image
-            onClick={() => interactive && setScreenPreviewOpen(true)}
             src={screen.dataUrl}
             alt={screen.name}
             width={220}
             height={280}
             className="m-auto h-full max-h-24 w-auto cursor-pointer rounded-sm border"
+            onClick={() => interactive && setScreenPreviewOpen(true)}
           />
         </div>
 
@@ -62,8 +62,8 @@ export function ScreenPreviewListItem({
             <Input
               value={screenName}
               className="h-8 w-full text-sm transition-all"
-              onChange={e => setScreenName(e.target.value)}
               readOnly={!editableTitle}
+              onChange={e => setScreenName(e.target.value)}
             />
             {editableTitle && (
               <Button
@@ -85,8 +85,8 @@ export function ScreenPreviewListItem({
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => downloadScreen(screen.dataUrl, screen.name)}
-                className={cn('transition-all delay-75')}>
+                className={cn('transition-all delay-75')}
+                onClick={() => downloadScreen(screen.dataUrl, screen.name)}>
                 <Download /> Download
               </Button>
             )}
@@ -94,8 +94,8 @@ export function ScreenPreviewListItem({
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={() => removeScreen(screen.id)}
-                className={cn('transition-all delay-75')}>
+                className={cn('transition-all delay-75')}
+                onClick={() => removeScreen(screen.id)}>
                 <Trash /> Delete
               </Button>
             )}

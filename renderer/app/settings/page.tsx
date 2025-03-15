@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { UpdateDetails, UserSettings } from '@/types'
+import type { UpdateDetails, UserSettings } from '@/types'
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import style from '@/styles/markdown.module.css'
@@ -62,8 +62,8 @@ function DownloadUpdate({ updateDetails }: { updateDetails: UpdateDetails }) {
         </CardHeader>
         <CardContent>
           <Accordion
-            type="single"
-            collapsible>
+            collapsible
+            type="single">
             <AccordionItem value="item-1">
               <AccordionTrigger>
                 <h3>What changed?</h3>

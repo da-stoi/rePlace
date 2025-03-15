@@ -3,7 +3,7 @@ import '@/styles/globals.css'
 // import localFont from 'next/font/local'
 
 import { cn } from '@/lib/utils'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import ThemeProvider from '@/components/providers/theme-provider'
 import Header from '@/components/misc/header'
 
@@ -30,15 +30,15 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
-      suppressHydrationWarning>
+      suppressHydrationWarning
+      lang="en">
       <body className={cn('bg-background font-sans antialiased')}>
         <Header />
         <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
           enableSystem
-          disableTransitionOnChange>
+          disableTransitionOnChange
+          attribute="class"
+          defaultTheme="system">
           {children}
         </ThemeProvider>
       </body>

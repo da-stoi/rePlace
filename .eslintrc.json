@@ -1,25 +1,90 @@
 {
-  "root": false,
-  "parser": "@typescript-eslint/parser",
-  "extends": [
-    "next",
-    "next/core-web-vitals",
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:import/errors",
-    "plugin:import/warnings",
-    "plugin:tailwindcss/recommended",
-    "prettier"
-  ],
-  "rules": {
-    "no-html-link-for-pages": "off"
+  "root": true,
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
   },
   "settings": {
-    "next": {
-      "rootDir": "./renderer"
+    "react": {
+      "version": "detect"
     }
   },
-  "plugins": ["prettier", "@typescript-eslint", "tailwindcss"]
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["./tsconfig.json", "./renderer/tsconfig.json"], // Include the new tsconfig file
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2021,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "import",
+    "simple-import-sort",
+    "unused-imports",
+    "filenames",
+    "prettier" // Ensure Prettier is listed here
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "next/core-web-vitals",
+    "plugin:prettier/recommended", // Use this to include prettier settings
+    "prettier" // Add this to turn off conflicting ESLint rules
+  ],
+  "rules": {
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 1
+      }
+    ],
+    "react/jsx-sort-props": [
+      "error",
+      {
+        "callbacksLast": true,
+        "shorthandFirst": true,
+        "noSortAlphabetically": true,
+        "reservedFirst": true
+      }
+    ],
+    "camelcase": [
+      "error",
+      {
+        "properties": "always"
+      }
+    ],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "variableLike",
+        "format": ["camelCase", "PascalCase"],
+        "leadingUnderscore": "allow" // Allow leading underscore for unused variables
+      }
+    ],
+    "@typescript-eslint/no-floating-promises": "off",
+    "react/jsx-no-useless-fragment": "error",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "react/jsx-boolean-value": ["error", "never"],
+    "no-template-curly-in-string": "error",
+    "react/no-danger": "warn",
+    "@typescript-eslint/no-unsafe-assignment": "warn",
+    "@typescript-eslint/no-unsafe-return": "warn"
+  }
 }

@@ -6,7 +6,8 @@
     "../dist/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    "../app/types/**/*.ts"
+    "../app/types/**/*.ts",
+    "**/*.js"
   ],
   "exclude": ["node_modules"],
   "compilerOptions": {

@@ -1,6 +1,6 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { ScreenInfo } from '@/types'
+import type { ScreenInfo } from '@/types'
 import { Save, Download, Trash } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -56,8 +56,8 @@ export function ScreenPreviewGridItem({
       <Input
         value={screenName}
         className="h-8 text-center text-sm transition-all"
-        onChange={e => setScreenName(e.target.value)}
         readOnly={!editableTitle}
+        onChange={e => setScreenName(e.target.value)}
       />
       {editableTitle && (
         <Button
@@ -84,13 +84,13 @@ export function ScreenPreviewGridItem({
                 <Button
                   variant="secondary"
                   size="sm"
-                  onMouseOver={() => setHovered(true)}
-                  onMouseOut={() => setHovered(false)}
-                  onClick={() => downloadScreen(screen.dataUrl, screen.name)}
                   className={cn(
                     'transition-all delay-75',
                     hovered ? 'opacity-100' : 'opacity-0'
-                  )}>
+                  )}
+                  onMouseOver={() => setHovered(true)}
+                  onMouseOut={() => setHovered(false)}
+                  onClick={() => downloadScreen(screen.dataUrl, screen.name)}>
                   <Download />
                 </Button>
               </TooltipTrigger>
@@ -105,13 +105,13 @@ export function ScreenPreviewGridItem({
                 <Button
                   variant="destructive"
                   size="sm"
-                  onMouseOver={() => setHovered(true)}
-                  onMouseOut={() => setHovered(false)}
-                  onClick={() => removeScreen(screen.id)}
                   className={cn(
                     'transition-all delay-75',
                     hovered ? 'opacity-100' : 'opacity-0'
-                  )}>
+                  )}
+                  onMouseOver={() => setHovered(true)}
+                  onMouseOut={() => setHovered(false)}
+                  onClick={() => removeScreen(screen.id)}>
                   <Trash />
                 </Button>
               </TooltipTrigger>
@@ -122,14 +122,14 @@ export function ScreenPreviewGridItem({
       </div>
       {showTitle && titlePosition === 'top' && titleBox}
       <Image
-        onMouseOver={() => setHovered(true)}
-        onMouseOut={() => setHovered(false)}
-        onClick={() => interactive && setScreenPreviewOpen(true)}
         src={screen.dataUrl}
         alt={screen.name}
         width={220}
         height={280}
         className="m-auto mb-2 h-full max-h-[calc(100vh_-_18rem)] w-auto rounded-md border"
+        onMouseOver={() => setHovered(true)}
+        onMouseOut={() => setHovered(false)}
+        onClick={() => interactive && setScreenPreviewOpen(true)}
       />
       {showTitle && titlePosition === 'bottom' && titleBox}
       <ScreenDialog

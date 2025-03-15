@@ -1,7 +1,12 @@
 import React from 'react'
 import { Wifi, Cable, Eye, EyeOff } from 'lucide-react'
 import { cn } from '../../lib/utils'
-import { DeviceInfo, DeviceType, DeviceMethod, Connection } from '../../types'
+import type {
+  DeviceInfo,
+  DeviceType,
+  DeviceMethod,
+  Connection
+} from '../../types'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import {
@@ -65,8 +70,8 @@ function DeviceSelector({
       {existingDevices && (
         <Button
           variant="secondary"
-          onClick={cancel}
-          className="m-auto w-fit">
+          className="m-auto w-fit"
+          onClick={cancel}>
           Cancel
         </Button>
       )}
@@ -250,11 +255,11 @@ function ConnectionDetails({
         </div>
         <span
           className="text-muted-foreground m-auto inline w-max cursor-pointer select-none underline hover:no-underline"
-          onClick={() =>
+          onClick={() => {
             window.ipc.externalLink(
               'https://remarkable.guide/guide/access/ssh.html#finding-your-device-password-and-ip-addresses'
             )
-          }>
+          }}>
           Where do I find this?
         </span>
       </div>

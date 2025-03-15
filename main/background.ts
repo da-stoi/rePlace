@@ -1,10 +1,9 @@
 import path from 'path'
-import { app, ipcMain, shell, Notification } from 'electron'
+import { app, ipcMain, shell, Notification, nativeTheme } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
 import Client from 'ssh2-sftp-client'
-import { nativeTheme } from 'electron'
-import {
+import type {
   Connection,
   DeviceInfo,
   HostStatus,
@@ -85,7 +84,7 @@ function promiseWithTimeout<T>(
         clearTimeout(timer)
         resolve(value)
       })
-      .catch(error => {
+      .catch((error: Error) => {
         clearTimeout(timer)
         reject(error)
       })
@@ -98,14 +97,14 @@ app.on('window-all-closed', () => {
 })
 
 // Open external links in default browser
-ipcMain.on('external-link', async (event, url) => {
+ipcMain.on('external-link', (_event, url: string) => {
   // Open in default browser
   shell.openExternal(url)
 })
 
 ipcMain.on(
   'notify',
-  async (event, title: string, body: string, onClickEvent: string) => {
+  (_event, title: string, body: string, _onClickEvent: string) => {
     new Notification({
       title,
       body
@@ -114,77 +113,83 @@ ipcMain.on(
 )
 
 // Ping device list to detect alive hosts
-ipcMain.on('ping-devices', async (event, devices: DeviceInfo[]) => {
-  const aliveDevices: HostStatus[] = await Promise.all(
-    devices.map(async device => {
-      try {
-        // Ping device ip
-        const devicePing = await ping.promise.probe(device.connection.host, {
-          timeout: 1
-        })
+ipcMain.on('ping-devices', (event, devices: DeviceInfo[]) => {
+  ;(async () => {
+    const aliveDevices: HostStatus[] = await Promise.all(
+      devices.map(async device => {
+        try {
+          // Ping device ip
+          const devicePing = await ping.promise.probe(device.connection.host, {
+            timeout: 1
+          })
 
-        return {
-          id: device.id,
-          alive: devicePing.alive || false
+          return {
+            id: device.id,
+            alive: devicePing.alive || false
+          }
+        } catch {
+          return {
+            id: device.id,
+            alive: false
+          }
         }
-      } catch (err) {
-        return {
-          id: device.id,
-          alive: false
-        }
-      }
-    })
-  )
+      })
+    )
 
-  event.reply(
-    'ping-devices-res',
-    aliveDevices.filter(device => device)
-  )
+    event.reply(
+      'ping-devices-res',
+      aliveDevices.filter(device => device)
+    )
+  })().catch(console.error)
 })
 
 // Check if a device is connected
-ipcMain.on('check-device', async event => {
-  try {
-    await promiseWithTimeout(sftp.list('/usr/share/remarkable'), 1500)
-    event.reply('check-device-res', { connected: true })
-  } catch (err) {
-    event.reply('check-device-res', { connected: false })
-  }
+ipcMain.on('check-device', event => {
+  ;(async () => {
+    try {
+      await promiseWithTimeout(sftp.list('/usr/share/remarkable'), 1500)
+      event.reply('check-device-res', { connected: true })
+    } catch {
+      event.reply('check-device-res', { connected: false })
+    }
+  })().catch(console.error)
 })
 
 // Watch a connected device
-ipcMain.on('connect-device', async (event, connection: Connection) => {
-  sftp.end()
-
-  try {
+ipcMain.on('connect-device', (event, connection: Connection) => {
+  ;(async () => {
     sftp.end()
 
-    await promiseWithTimeout(
-      sftp.connect({
-        host: connection.host,
-        port: connection.port || 22,
-        username: connection.username,
-        password: connection.password,
-        readyTimeout: 2000
-      }),
-      3000
-    )
+    try {
+      sftp.end()
 
-    event.reply('connect-device-res', { connected: true })
-  } catch (err) {
-    event.reply('connect-device-res', { connected: false })
-    console.log('Failed to connect to device:', err)
-  }
+      await promiseWithTimeout(
+        sftp.connect({
+          host: connection.host,
+          port: connection.port || 22,
+          username: connection.username,
+          password: connection.password,
+          readyTimeout: 2000
+        }),
+        3000
+      )
+
+      event.reply('connect-device-res', { connected: true })
+    } catch (err) {
+      event.reply('connect-device-res', { connected: false })
+      console.log('Failed to connect to device:', err)
+    }
+  })().catch(console.error)
 })
 
 // Disconnect from a connected device
-ipcMain.on('disconnect-device', async event => {
+ipcMain.on('disconnect-device', event => {
   sftp.end()
   event.reply('disconnect-device-res', { disconnected: true })
 })
 
 // Add new device to user data
-ipcMain.on('add-device', async (event, device: DeviceInfo) => {
+ipcMain.on('add-device', (event, device: DeviceInfo) => {
   const editDevice = device.id !== undefined
 
   if (editDevice) {
@@ -201,125 +206,142 @@ ipcMain.on('add-device', async (event, device: DeviceInfo) => {
   }
 
   // Update devices list
-  let devices = store.get('devices', []) as DeviceInfo[]
+  const devices = store.get('devices', []) as DeviceInfo[]
   devices.push(device)
   store.set('devices', devices)
 
   // Return new device
   event.reply('add-device-res', device)
-  return device
 })
 
 // Get devices from user data
-ipcMain.on('get-devices', async event => {
+ipcMain.on('get-devices', event => {
   const devices = store.get('devices', []) as DeviceInfo[]
   event.reply('get-devices-res', devices)
-  return devices
 })
 
 // Remove device from user data
-ipcMain.on('remove-device', async (event, id) => {
+ipcMain.on('remove-device', (_event, id) => {
   // Update devices list
   let devices = store.get('devices', []) as DeviceInfo[]
   devices = devices.filter(device => device.id !== id)
   store.set('devices', devices)
 })
 
-ipcMain.on('get-files', async (event, connection) => {
-  try {
-    const files = await promiseWithTimeout(
-      sftp.list('/usr/share/remarkable'),
-      2000
-    )
+ipcMain.on('get-files', (event, _connection) => {
+  ;(async () => {
+    try {
+      const files = await promiseWithTimeout(
+        sftp.list('/usr/share/remarkable'),
+        2000
+      )
 
-    const fileNames = files
-      .map(file => file.name)
-      .filter(file => {
-        const screens = [
-          'starting.png',
-          'poweroff.png',
-          'suspended.png',
-          'batteryempty.png',
-          'overheating.png',
-          'rebooting.png'
-        ]
-        return file.includes('.png') && screens.includes(file)
+      const fileNames = files
+        .map(file => file.name)
+        .filter(file => {
+          const screens = [
+            'starting.png',
+            'poweroff.png',
+            'suspended.png',
+            'batteryempty.png',
+            'overheating.png',
+            'rebooting.png'
+          ]
+          return file.includes('.png') && screens.includes(file)
+        })
+        .sort((a, b) => a.localeCompare(b))
+
+      const images: ScreenInfo[] = await Promise.all(
+        fileNames.map(async fileName => {
+          const image = await sftp.get(`/usr/share/remarkable/${fileName}`)
+          const dataUrl = `data:image/png;base64,${(image as Buffer).toString('base64')}`
+          return { id: fileName, name: fileName, dataUrl, addDate: new Date() }
+        })
+      )
+
+      event.reply('get-files-res', images)
+    } catch (err) {
+      event.reply('log', err)
+      console.log('Failed to get files:', err)
+
+      event.reply('get-files-res', {
+        error: 'Could not connect to SFTP server'
       })
-      .sort((a, b) => a.localeCompare(b))
-
-    const images: ScreenInfo[] = await Promise.all(
-      fileNames.map(async fileName => {
-        const image = await sftp.get(`/usr/share/remarkable/${fileName}`)
-        const dataUrl = `data:image/png;base64,${image.toString('base64')}`
-        return { id: fileName, name: fileName, dataUrl, addDate: new Date() }
-      })
-    )
-
-    event.reply('get-files-res', images)
-    return images
-  } catch (err) {
-    event.reply('log', err)
-    console.log('Failed to get files:', err)
-
-    event.reply('get-files-res', { error: 'Could not connect to SFTP server' })
-    return { error: 'Could not connect to SFTP server' }
-  }
+    }
+  })().catch(console.error)
 })
 
-ipcMain.on('upload-file', async (event, { connection, screen, file }) => {
-  const sftp = new Client()
-  try {
-    await sftp.connect({
-      host: connection.host,
-      port: 22,
-      username: connection.username,
-      password: connection.password,
-      readyTimeout: 3000
+ipcMain.on(
+  'upload-file',
+  (
+    event,
+    {
+      connection,
+      screen,
+      file
+    }: { connection: Connection; screen: string; file: string }
+  ) => {
+    ;(async () => {
+      const sftp = new Client()
+      try {
+        await sftp.connect({
+          host: connection.host,
+          port: 22,
+          username: connection.username,
+          password: connection.password,
+          readyTimeout: 3000
+        })
+
+        const buffer = Buffer.from(
+          file.replace(/^data:image\/\w+;base64,/, ''),
+          'base64'
+        )
+        await sftp.put(buffer, `/usr/share/remarkable/${screen}.png`)
+
+        // Get updated files
+        ipcMain.emit('get-files', event, connection)
+
+        event.reply('upload-file', { success: true })
+      } catch (err) {
+        event.reply('log', err)
+        console.log('Failed to upload file:', err)
+
+        event.reply('upload-file-res', { error: 'Could not upload file' })
+      }
+    })().catch(err => {
+      event.reply('log', err)
+      event.reply('upload-file-res', { error: 'Could not upload file' })
     })
-
-    const buffer = Buffer.from(
-      file.replace(/^data:image\/\w+;base64,/, ''),
-      'base64'
-    )
-    await sftp.put(buffer, `/usr/share/remarkable/${screen}.png`)
-
-    // Get updated files
-    ipcMain.emit('get-files', event, connection)
-
-    event.reply('upload-file', { success: true })
-    return { success: true }
-  } catch (err) {
-    event.reply('log', err)
-    console.log('Failed to upload file:', err)
-
-    event.reply('upload-file-res', { error: 'Could not upload file' })
-    return { error: 'Could not upload file' }
   }
-})
+)
 
-ipcMain.on('update-user-setting', async (event, key, value) => {
-  let userSettings = store.get('userSettings', {}) as UserSettings
+ipcMain.on(
+  'update-user-setting',
+  (event, key, value: string | number | object | boolean) => {
+    let userSettings = store.get('userSettings', {}) as UserSettings
 
-  userSettings = { ...userSettings, [key]: value }
+    userSettings = { ...userSettings, [key]: value }
 
-  store.set('userSettings', userSettings)
+    store.set('userSettings', userSettings)
 
-  event.reply('get-user-settings-res', userSettings)
-})
+    event.reply('get-user-settings-res', userSettings)
+  }
+)
 
-ipcMain.on('get-user-settings', async event => {
+ipcMain.on('get-user-settings', event => {
   const userSettings = store.get('userSettings', {})
   event.reply('get-user-settings-res', userSettings)
 })
 
-ipcMain.on('get-update', async event => {
-  const preRelease = store.get('userSettings.preRelease', false) as boolean
-  const updateDetails = await checkForAppUpdate(preRelease)
-
-  event.reply('get-update-res', updateDetails)
+ipcMain.on('get-update', event => {
+  ;(async () => {
+    const preRelease = store.get('userSettings.preRelease', false) as boolean
+    const updateDetails = await checkForAppUpdate(preRelease)
+    event.reply('get-update-res', updateDetails)
+  })().catch(console.error)
 })
 
-ipcMain.on('add-screen', async (event, screen: ScreenInfo) => {
+ipcMain.on('add-screen', (event, screen: ScreenInfo) => {
   let screens = store.get('screens', []) as ScreenInfo[]
 
   if (screens.find(s => s.id === screen.id)) {
@@ -336,7 +358,7 @@ ipcMain.on('add-screen', async (event, screen: ScreenInfo) => {
   )
 })
 
-ipcMain.on('get-screens', async event => {
+ipcMain.on('get-screens', event => {
   const screens = store.get('screens', []) as ScreenInfo[]
   event.reply(
     'get-screens-res',
@@ -346,7 +368,7 @@ ipcMain.on('get-screens', async event => {
   )
 })
 
-ipcMain.on('remove-screen', async (event, id) => {
+ipcMain.on('remove-screen', (event, id) => {
   let screens = store.get('screens', []) as ScreenInfo[]
   screens = screens.filter(screen => screen.id !== id)
   store.set('screens', screens)

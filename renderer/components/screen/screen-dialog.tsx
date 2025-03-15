@@ -3,7 +3,7 @@ import { X } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog'
 import Image from 'next/image'
-import { ScreenInfo } from '@/types'
+import type { ScreenInfo } from '@/types'
 
 export default function ScreenDialog({
   screen,

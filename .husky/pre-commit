@@ -1,0 +1,2 @@
+yarn format:check
+yarn lint

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Brush, Upload } from 'lucide-react'
-import { ScreenInfo } from '../../types'
+import type { ScreenInfo } from '../../types'
 import { Button } from '../ui/button'
 import { ScreenCarousel } from './screen-carousel'
 
@@ -79,9 +79,9 @@ export default function ScreenManager() {
           <Brush /> Create Screen
         </Button>
         <input
+          ref={fileInputRef}
           type="file"
           accept="image/png"
-          ref={fileInputRef}
           className="hidden"
           onChange={e => {
             const file = e.target.files?.[0]

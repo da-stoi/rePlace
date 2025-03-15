@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { UpdateDetails, UserSettings } from '@/types'
+import type { UpdateDetails, UserSettings } from '@/types'
 import { useTheme } from 'next-themes'
 import notify from '@/lib/notify'
 import { motion } from 'motion/react'
@@ -29,12 +29,12 @@ export default function StartupAnimation() {
   React.useEffect(() => {
     if (open) {
       // Change text
-      reText.current!.textContent = 're'
-      placeText.current!.textContent = 'Place'
+      reText.current.textContent = 're'
+      placeText.current.textContent = 'Place'
     } else {
       // Change text
-      reText.current!.textContent = 'r'
-      placeText.current!.textContent = 'P'
+      reText.current.textContent = 'r'
+      placeText.current.textContent = 'P'
     }
   }, [open])
 
@@ -104,15 +104,15 @@ export default function StartupAnimation() {
       animate={{ opacity: fadeInComplete ? (animationComplete ? 0 : 1) : 0 }}
       transition={{ duration: 0.4, ...springProps }}>
       <motion.div
-        className="bg-foreground m-auto h-max w-max rounded-2xl px-3 py-4 text-center"
-        onClick={() => setOpen(!open)}
+        className="bg-foreground m-auto size-max rounded-2xl px-3 py-4 text-center"
         data-open={open}
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: open ? 1.2 : 1, opacity: fadeInComplete ? 1 : 0 }}
-        transition={{ duration: 0.2, ...springProps }}>
+        transition={{ duration: 0.2, ...springProps }}
+        onClick={() => setOpen(!open)}>
         <motion.h1
           ref={reText}
-          className="text-background m-auto inline-block overflow-clip font-mono text-6xl font-bold"
+          className="text-background m-auto inline-block text-clip font-mono text-6xl font-bold"
           initial={{ width: '30px' }}
           animate={{ width: open ? '60px' : '30px' }}
           transition={{ duration: 0.2, ...springProps }}>
@@ -120,7 +120,7 @@ export default function StartupAnimation() {
         </motion.h1>
         <motion.h1
           ref={placeText}
-          className="text-background m-auto inline-block overflow-clip font-mono text-6xl font-bold"
+          className="text-background m-auto inline-block text-clip font-mono text-6xl font-bold"
           initial={{ width: '38px' }}
           animate={{ width: open ? '150px' : '38px' }}
           transition={{ duration: 0.2, ...springProps }}>

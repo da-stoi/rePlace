@@ -2,7 +2,7 @@
 
 // import { React.useEffect, React.useRef, React.useState } from 'react'
 import React from 'react'
-import { DeviceInfo, DeviceMethod, DeviceType, ScreenInfo } from '@/types'
+import type { DeviceInfo, DeviceMethod, DeviceType, ScreenInfo } from '@/types'
 import {
   ChevronsLeftRightEllipsis,
   FolderInput,
@@ -232,7 +232,7 @@ export default function Connection() {
     window.ipc.checkDevice()
   }
 
-  const connectDevice = async () => {
+  const connectDevice = () => {
     if (!deviceInfo) {
       return
     }
@@ -246,7 +246,7 @@ export default function Connection() {
     window.location.href = `../main`
   }
 
-  const getFiles = async () => {
+  const getFiles = () => {
     console.log('getfile', deviceInfo)
     if (!deviceInfo) {
       return
@@ -255,7 +255,7 @@ export default function Connection() {
     window.ipc.getFiles(deviceInfo.connection)
   }
 
-  const uploadScreen = async () => {
+  const uploadScreen = () => {
     if (!deviceInfo || !selectedSavedScreen || !selectedRemoteScreen) {
       return
     }
@@ -324,15 +324,15 @@ export default function Connection() {
           <div className="w-full max-w-[calc(50vw_-_15rem)]">
             <h1 className="text-center text-2xl font-bold">Saved Screens</h1>
             <ScreenCarousel
+              showTitle
               className="w-full max-w-[calc(50vw_-_15rem)]"
               screens={savedScreens}
-              onSelect={setSelectedSavedScreen}
               titlePosition={'top'}
-              showTitle={true}
               editableTitle={false}
               showDeleteButton={false}
               showDownloadButton={false}
               showScreenCountBar={false}
+              onSelect={setSelectedSavedScreen}
             />
           </div>
 
@@ -347,6 +347,7 @@ export default function Connection() {
             </h1>
             {remoteScreens && remoteScreens.length > 0 ? (
               <ScreenCarousel
+                showTitle
                 className="w-full max-w-[calc(50vw_-_15rem)]"
                 screens={
                   remoteScreens
@@ -358,13 +359,12 @@ export default function Connection() {
                       })) as ScreenInfo[])
                     : []
                 }
-                onSelect={setSelectedRemoteScreen}
                 titlePosition={'top'}
-                showTitle={true}
                 editableTitle={false}
                 showDeleteButton={false}
                 showDownloadButton={false}
                 showScreenCountBar={false}
+                onSelect={setSelectedRemoteScreen}
               />
             ) : (
               <div className="my-auto flex w-full max-w-[calc(50vw_-_15rem)] flex-col items-center gap-4">
@@ -380,13 +380,13 @@ export default function Connection() {
       {/* Upload button */}
       <Button
         className="text-background fixed bottom-5 left-1/2 -translate-x-1/2"
-        onClick={() => setShowUploadModal(true)}
         disabled={
           !connected ||
           connectionFailed ||
           !selectedSavedScreen ||
           !selectedRemoteScreen
-        }>
+        }
+        onClick={() => setShowUploadModal(true)}>
         <FolderInput /> Update Screen
       </Button>
 

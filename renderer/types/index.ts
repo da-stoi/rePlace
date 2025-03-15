@@ -31,11 +31,11 @@ type CustomizableScreenProps = {
 type CurrentScreensProps = {
   connection: Connection | null
   files: ScreenInfo[]
-  updateConnection: Function
-  setFiles: Function
-  getFiles: Function
-  setScreenSelect: Function
-  revertScreen: Function
+  // updateConnection: Function
+  // setFiles: Function
+  getFiles: (connection: Connection) => ScreenInfo[]
+  // setScreenSelect: Function
+  // revertScreen: Function
 }
 
 type UploadScreenProps = {
@@ -43,20 +43,20 @@ type UploadScreenProps = {
   screenUpload: File | null
   screenSelect: string
   uploading: boolean
-  getImageDimensions: Function
-  clearScreenUpload: Function
-  setScreenUpload: Function
-  getFiles: Function
-  setScreenSelect: Function
-  setScreenMode: Function
+  getImageDimensions: (file: File) => Promise<{ width: number; height: number }>
+  // clearScreenUpload: Function
+  // setScreenUpload: Function
+  getFiles: (connection: Connection) => ScreenInfo[]
+  // setScreenSelect: Function
+  // setScreenMode: Function
 }
 
 type CreateScreenProps = {
   connection: Connection | null
   screenSelect: string
-  getFiles: Function
-  setScreenSelect: Function
-  setScreenMode: Function
+  getFiles: (connection: Connection) => ScreenInfo[]
+  // setScreenSelect: Function
+  // setScreenMode: Function
 }
 
 type HostStatus = {
@@ -85,14 +85,15 @@ type UserSettings = {
 
 type Asset = {
   platform: string
-  browser_download_url: string
+  browser_download_url?: string
+  browserDownloadUrl?: string
 }
 
 type UpdateDetails = {
-  id: string // tag_name
+  id: number // tag_name
   name: string // name
   preRelease: boolean // prerelease
-  publishedAt: Date // published_at
+  publishedAt: string // published_at
   body: string
   platformAsset?: Asset
   assets: Asset[]
@@ -103,6 +104,24 @@ type ScreenInfo = {
   name: string
   dataUrl: string
   addDate: Date
+}
+
+type UpdateData = {
+  tag_name: string
+  name: string
+  id: number
+  draft: boolean
+  prerelease: boolean
+  published_at: string
+  body: string
+  assets: Asset[]
+}
+
+type WindowState = {
+  x: number
+  y: number
+  width: number
+  height: number
 }
 
 // Export
@@ -121,5 +140,7 @@ export type {
   UserSettings,
   UpdateDetails,
   Asset,
-  ScreenInfo
+  ScreenInfo,
+  UpdateData,
+  WindowState
 }

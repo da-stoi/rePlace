@@ -47,7 +47,7 @@ const MultiStepIndicator: React.FC<MultiStepIndicatorProps> = ({
 
         {/* Step indicators */}
         <div className="absolute left-0 top-1/4 flex w-full items-center justify-between">
-          {Array.from({ length: totalSteps }).map((_, index) => (
+          {Array.from({ length: totalSteps }).map((_item, index) => (
             <div
               key={index}
               className={cn(

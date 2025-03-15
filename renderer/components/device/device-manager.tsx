@@ -1,5 +1,5 @@
 import React from 'react'
-import { DeviceInfo, UserSettings, HostStatus } from '../../types'
+import type { DeviceInfo, UserSettings, HostStatus } from '../../types'
 import NewDevice from './new-device'
 import DeviceList from './device-list'
 

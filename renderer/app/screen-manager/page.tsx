@@ -9,7 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
-import { ScreenInfo } from '@/types'
+import type { ScreenInfo } from '@/types'
 import {
   BookImage,
   Brush,
@@ -125,7 +125,9 @@ export default function ScreenManager() {
               type="file"
               accept=".png"
               className="hidden"
-              onChange={e => handleFileUpload(e.target.files?.[0])}
+              onChange={e => {
+                handleFileUpload(e.target.files?.[0])
+              }}
             />
 
             {/* Create screen */}
@@ -158,45 +160,41 @@ export default function ScreenManager() {
         </div>
 
         {gridView ? (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {screens.map(screen => (
-                <div
-                  key={screen.id}
-                  className="m-2 max-w-64">
-                  <ScreenPreviewGridItem
-                    screen={screen}
-                    showTitle={true}
-                    showDownloadButton={true}
-                    showDeleteButton={true}
-                    titlePosition="bottom"
-                    editableTitle={true}
-                    interactive={true}
-                  />
-                </div>
-              ))}
-            </div>
-          </>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {screens.map(screen => (
+              <div
+                key={screen.id}
+                className="m-2 max-w-64">
+                <ScreenPreviewGridItem
+                  showTitle
+                  showDownloadButton
+                  showDeleteButton
+                  editableTitle
+                  interactive
+                  screen={screen}
+                  titlePosition="bottom"
+                />
+              </div>
+            ))}
+          </div>
         ) : (
-          <>
-            <div>
-              {screens.map((screen, i) => (
-                <div
-                  key={screen.id}
-                  className="m-auto max-w-lg">
-                  {i !== 0 && <Separator />}
-                  <ScreenPreviewListItem
-                    screen={screen}
-                    showTitle={true}
-                    showDownloadButton={true}
-                    showDeleteButton={true}
-                    editableTitle={true}
-                    interactive={true}
-                  />
-                </div>
-              ))}
-            </div>
-          </>
+          <div>
+            {screens.map((screen, i) => (
+              <div
+                key={screen.id}
+                className="m-auto max-w-lg">
+                {i !== 0 && <Separator />}
+                <ScreenPreviewListItem
+                  showTitle
+                  showDownloadButton
+                  showDeleteButton
+                  editableTitle
+                  interactive
+                  screen={screen}
+                />
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

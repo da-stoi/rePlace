@@ -1,5 +1,9 @@
 *.md
 *.mdx
 .next
+.husky
+.vscode
 node_modules
+app
+!renderer/app
 dist
