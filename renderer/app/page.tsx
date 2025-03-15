@@ -1,10 +1,10 @@
 'use client'
 
 import React from 'react'
-import { cn } from '@/lib/utils'
 import { UpdateDetails, UserSettings } from '@/types'
 import { useTheme } from 'next-themes'
 import notify from '@/lib/notify'
+import { motion } from 'motion/react'
 
 export default function StartupAnimation() {
   const { setTheme } = useTheme()
@@ -12,11 +12,20 @@ export default function StartupAnimation() {
   const [open, setOpen] = React.useState<boolean>(false)
   const [animationComplete, setAnimationComplete] =
     React.useState<boolean>(false)
+  const [fadeInComplete, setFadeInComplete] = React.useState<boolean>(false)
 
-  const block = React.useRef<HTMLDivElement>(null)
-  const reText = React.useRef<HTMLHeadingElement>(null)
-  const placeText = React.useRef<HTMLHeadingElement>(null)
+  const block = React.useRef<HTMLDivElement>(null) // Block element
+  const reText = React.useRef<HTMLHeadingElement>(null) // r/re text
+  const placeText = React.useRef<HTMLHeadingElement>(null) // P/Place text
 
+  // Spring animation properties
+  const springProps = {
+    type: 'spring',
+    stiffness: 200,
+    damping: 20
+  }
+
+  // Change text on open
   React.useEffect(() => {
     if (open) {
       // Change text
@@ -29,17 +38,21 @@ export default function StartupAnimation() {
     }
   }, [open])
 
+  // Get user settings and check for updates, then animate
   React.useEffect(() => {
     window.ipc.getUpdate()
     window.ipc.getUserSettings()
 
+    // Get user settings
     window.ipc.on('get-user-settings-res', (settings: UserSettings) => {
+      // Set theme
       if (settings.theme) {
         setTheme(settings.theme)
       } else {
-        setTheme('system')
+        setTheme('system') // Default to system theme
       }
 
+      // Skip splash screen if enabled
       if (settings.skipSplashScreen) {
         window.location.href = './main'
       }
@@ -57,74 +70,78 @@ export default function StartupAnimation() {
       }
     })
 
-    // Open animation
+    // Fade in animation
     setTimeout(() => {
-      setOpen(true)
+      setFadeInComplete(true) // Fade in
     }, 600)
 
-    // Close animation
+    // Scale animation
     setTimeout(() => {
-      setOpen(false)
-      // Redirect
+      setOpen(true) // Scale in
       setTimeout(() => {
-        setAnimationComplete(true)
-      }, 400) // Wait for fade out animation to finish
-    }, 2500)
+        setOpen(false) // Scale out
+      }, 2000)
+    }, 1200)
 
-    // Redirect
+    // Fade out animation
     setTimeout(() => {
-      if (!window.ipc) {
-        console.warn('ipc is not available on window')
-        return
-      }
-
-      window.location.href = './main'
-    }, 3200)
+      setAnimationComplete(true) // Fade out
+    }, 3500)
   }, [])
 
+  // Redirect to main page
+  React.useEffect(() => {
+    if (animationComplete) {
+      window.location.href = './main'
+    }
+  }, [animationComplete])
+
   return (
-    <div
+    <motion.div
       ref={block}
-      className="animate-all fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-      <div
-        className={cn(
-          'animate-fade-and-scale-in bg-foreground m-auto h-max w-max rounded-2xl px-3 py-4 text-center transition-all duration-300 ease-in-out',
-          animationComplete ? 'opacity-0' : 'opacity-100'
-        )}
+      className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: fadeInComplete ? (animationComplete ? 0 : 1) : 0 }}
+      transition={{ duration: 0.4, ...springProps }}>
+      <motion.div
+        className="bg-foreground m-auto h-max w-max rounded-2xl px-3 py-4 text-center"
         onClick={() => setOpen(!open)}
-        data-open={open}>
-        <h1
+        data-open={open}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: open ? 1.2 : 1, opacity: fadeInComplete ? 1 : 0 }}
+        transition={{ duration: 0.2, ...springProps }}>
+        <motion.h1
           ref={reText}
-          className={cn(
-            'text-background m-auto inline-block overflow-clip font-mono text-6xl font-bold transition-all ease-in-out',
-            open ? 'w-[60px]' : 'w-[30px]'
-          )}>
+          className="text-background m-auto inline-block overflow-clip font-mono text-6xl font-bold"
+          initial={{ width: '30px' }}
+          animate={{ width: open ? '60px' : '30px' }}
+          transition={{ duration: 0.2, ...springProps }}>
           r
-        </h1>
-        <h1
+        </motion.h1>
+        <motion.h1
           ref={placeText}
-          className={cn(
-            'text-background m-auto inline-block overflow-clip font-mono text-6xl font-bold transition-all ease-in-out',
-            open ? 'w-[150px]' : 'w-[38px]'
-          )}>
+          className="text-background m-auto inline-block overflow-clip font-mono text-6xl font-bold"
+          initial={{ width: '38px' }}
+          animate={{ width: open ? '150px' : '38px' }}
+          transition={{ duration: 0.2, ...springProps }}>
           P
-        </h1>
-      </div>
+        </motion.h1>
+      </motion.div>
       <br />
-      <p
-        className={cn(
-          'text-muted-foreground text-center transition-all delay-200',
-          open ? 'opacity-100' : 'opacity-0'
-        )}>
+      <motion.p
+        className="text-muted-foreground text-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: fadeInComplete ? 1 : 0 }}
+        transition={{ delay: 0.2, ...springProps }}>
         Built with <span className="font-mono text-xl">❤</span> and purpose
-      </p>
-      <p
-        className={cn(
-          'text-muted-foreground text-center transition-all delay-300',
-          open ? 'opacity-100' : 'opacity-0'
-        )}>
+      </motion.p>
+      <motion.p
+        className="text-muted-foreground text-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: fadeInComplete ? 1 : 0 }}
+        transition={{ delay: 0.3, ...springProps }}>
         By Daniel Stoiber
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   )
 }
