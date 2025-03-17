@@ -52,7 +52,7 @@ let mainWindow: Electron.BrowserWindow
   // Hide window buttons for 3 second splash screen animation
   if (isDarwin) {
     mainWindow.setWindowButtonVisibility(false)
-    setTimeout(() => mainWindow.setWindowButtonVisibility(true), 3200)
+    setTimeout(() => mainWindow.setWindowButtonVisibility(true), 3600)
   }
 
   // mainWindow.webContents.openDevTools({
