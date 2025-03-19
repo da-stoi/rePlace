@@ -19,10 +19,19 @@ import {
   Upload
 } from 'lucide-react'
 import React from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle
+} from '@/components/ui/dialog'
+import { OGUploadEditor } from '@/components/upload-editor/UploadEditorOG'
 
 export default function ScreenManager() {
   const [gridView, setGridView] = React.useState(true)
   const [screens, setScreens] = React.useState<ScreenInfo[]>([])
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null)
+  const [isEditorOpen, setIsEditorOpen] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
 
   React.useEffect(() => {
@@ -34,51 +43,21 @@ export default function ScreenManager() {
     })
   }, [])
 
-  const handleFileUpload = async (file: File) => {
-    const imageDimensions = await getImageDimensions(file)
-
-    if (imageDimensions.width !== 1404 || imageDimensions.height !== 1872) {
-      alert('reMarkable screens must be exactly 1404x1872.')
-      return
-    }
-
-    const reader = new FileReader()
-    reader.onload = () => {
-      const dataUrl = reader.result as string
-      const screenInfo: ScreenInfo = {
-        id: Date.now().toString(),
-        addDate: new Date(),
-        name: file.name,
-        dataUrl
-      }
-
-      // Add screen to saved screens
-      window.ipc.addScreen(screenInfo)
-
-      // Clear file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const getImageDimensions = (file: File) => {
-    return new Promise<{ width: number; height: number }>((resolve, reject) => {
-      const img = new window.Image()
-      img.onload = () => {
-        resolve({
-          width: img.width,
-          height: img.height
-        })
-      }
-      img.onerror = reject
-      img.src = URL.createObjectURL(file)
-    })
+  const handleFileUpload = (file: File) => {
+    setSelectedFile(file)
+    setIsEditorOpen(true)
   }
 
   const handleCreateScreen = () => {
     console.log('Create screen')
+  }
+
+  const handleEditorClose = () => {
+    setIsEditorOpen(false)
+    setSelectedFile(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   return (
@@ -197,6 +176,34 @@ export default function ScreenManager() {
           </div>
         )}
       </div>
+
+      {/* Image Editor Modal */}
+      {isEditorOpen && selectedFile && (
+        <>
+          <Dialog
+            open={isEditorOpen}
+            aria-label="Image Editor"
+            // onOpenChange={state => (!state ? handleEditorClose() : null)}
+          >
+            <DialogContent className="m-auto h-full max-h-[calc(100vh_-_8rem)] min-w-[750px] p-3 lg:min-w-[900px]">
+              <DialogTitle className="sr-only">Image editor</DialogTitle>
+              <DialogDescription className="sr-only">
+                Edit the image that was just uploaded.
+              </DialogDescription>
+              <OGUploadEditor
+                imageFile={selectedFile}
+                onSave={handleEditorClose}
+              />
+            </DialogContent>
+          </Dialog>
+          <div className="bg-background fixed bottom-5 left-1/2 z-[100] -translate-x-1/2 rounded-lg border px-3 py-1 text-center text-sm">
+            <p>
+              Scroll to resize • Drag to position • Snap points at center and
+              edges
+            </p>
+          </div>
+        </>
+      )}
     </div>
   )
 }

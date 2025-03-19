@@ -6,13 +6,20 @@ import { useState } from 'react'
 interface TiltProps {
   children: React.ReactNode
   className?: string
+  onMouseOver?: () => void
+  onMouseOut?: () => void
 }
 
 interface MouseMoveEvent extends React.MouseEvent<HTMLDivElement> {
   currentTarget: EventTarget & HTMLDivElement
 }
 
-export default function Tilt({ children, className }: TiltProps) {
+export default function Tilt({
+  children,
+  className,
+  onMouseOver,
+  onMouseOut
+}: TiltProps) {
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const [isHovering, setIsHovering] = useState(false)
@@ -37,7 +44,8 @@ export default function Tilt({ children, className }: TiltProps) {
     }
   }
 
-  const handleMouseLeave = () => {
+  const handleMouseOut = () => {
+    onMouseOut()
     // Animate back to center smoothly
     animate(x, 0, { type: 'spring', stiffness: 200, damping: 20 })
     animate(y, 0, { type: 'spring', stiffness: 200, damping: 20 })
@@ -51,8 +59,9 @@ export default function Tilt({ children, className }: TiltProps) {
         perspective: 1000,
         transformStyle: 'preserve-3d'
       }}
+      onMouseOver={onMouseOver}
       onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}>
+      onMouseOut={handleMouseOut}>
       <motion.div
         style={{
           rotateX,

@@ -77,7 +77,7 @@ export function ScreenPreviewGridItem({
 
   return (
     <div className="relative">
-      <div className="absolute bottom-12 right-1/2 flex -translate-y-1/2 translate-x-1/2 gap-2">
+      <div className="absolute bottom-12 right-1/2 z-10 flex -translate-y-1/2 translate-x-1/2 gap-2">
         {showDownloadButton && (
           <TooltipProvider>
             <Tooltip>
@@ -122,15 +122,18 @@ export function ScreenPreviewGridItem({
         )}
       </div>
       {showTitle && titlePosition === 'top' && titleBox}
-      <Tilt className={'h-full w-full'}>
+      <Tilt
+        className={'h-full w-full'}
+        onMouseOver={() => setHovered(true)}
+        onMouseOut={() => setHovered(false)}>
         <Image
           src={screen.dataUrl}
           alt={screen.name}
           width={220}
           height={280}
           className="m-auto mb-2 h-full max-h-[calc(100vh_-_18rem)] w-auto rounded-md border"
-          onMouseOver={() => setHovered(true)}
-          onMouseOut={() => setHovered(false)}
+          // onMouseOver={() => setHovered(true)}
+          // onMouseOut={() => setHovered(false)}
           onClick={() => interactive && setScreenPreviewOpen(true)}
         />
       </Tilt>
