@@ -12,7 +12,7 @@ export default function Connect() {
 
   React.useEffect(() => {
     setModalOpen(true)
-  })
+  }, [])
 
   return (
     <div className="mt-20">

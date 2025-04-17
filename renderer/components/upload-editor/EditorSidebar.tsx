@@ -18,8 +18,7 @@ import {
   Save,
   XCircle
 } from 'lucide-react'
-import type { EditorSidebarProps, ImageState } from './types'
-import type { UserSettings } from '@/types'
+import type { EditorSidebarProps } from './types'
 
 export const EditorSidebar: React.FC<EditorSidebarProps> = ({
   image,
@@ -36,32 +35,17 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
   backgroundColor,
   onToggleBackground,
   onCancel,
-  onSaveScreen
-}: {
-  image: ImageState
-  userSettings: UserSettings
-  onCenterHorizontally: () => void
-  onCenterVertically: () => void
-  onZoomIn: () => void
-  onZoomOut: () => void
-  onFitWidth: () => void
-  onFitHeight: () => void
-  onBrightnessChange: (value: number[]) => void
-  onContrastChange: (value: number[]) => void
-  onOpacityChange: (value: number[]) => void
-  backgroundColor: 'black' | 'white'
-  onToggleBackground: () => void
-  onCancel: () => void
-  onSaveScreen: () => void
+  onSave
 }) => {
   return (
-    <div className="bg-secondary h-full max-h-[calc(100vh_-_10rem)] min-w-64 overflow-y-scroll rounded-lg p-4 duration-200">
+    <div className="bg-card h-full max-h-[calc(100vh_-_10rem)] overflow-y-scroll rounded-lg p-4 duration-200">
       <div className="space-y-4">
         <div className="space-y-2">
           <h3 className="mb-2 flex items-center font-medium">
             <Move className="mr-2 h-4 w-4" />
-            Position &amp; Size
+            Position & Size
           </h3>
+
           <div className="grid grid-cols-2 gap-2">
             <Button
               size="sm"
@@ -69,7 +53,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
               disabled={!image.url}
               onClick={onCenterHorizontally}>
               <AlignCenterHorizontal className="mr-2 h-4 w-4" />
-              Center H
+              Center V
             </Button>
             <Button
               size="sm"
@@ -230,7 +214,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
         <div className="flex gap-2">
           <Button
             size="sm"
-            variant="outline"
+            variant="destructive"
             disabled={!image.url}
             onClick={onCancel}>
             <XCircle className="mr-2 h-4 w-4" />
@@ -238,9 +222,8 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
           </Button>
           <Button
             size="sm"
-            variant="outline"
             disabled={!image.url}
-            onClick={onSaveScreen}>
+            onClick={onSave}>
             <Save className="mr-2 h-4 w-4" />
             Save Screen
           </Button>
@@ -249,6 +232,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
         {userSettings?.developerMode && (
           <>
             <Separator className="bg-muted-foreground" />
+
             <div>
               <h3 className="mb-2 font-medium">Image Information</h3>
               {image.file ? (

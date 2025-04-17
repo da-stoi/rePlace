@@ -24,8 +24,8 @@ export default function Tilt({
   const y = useMotionValue(0)
   const [isHovering, setIsHovering] = useState(false)
 
-  const rotateX = useTransform(y, [-0.5, 0.5], [10, -10])
-  const rotateY = useTransform(x, [-0.5, 0.5], [-10, 10])
+  const rotateX = useTransform(y, [-0.5, 0.5], [8, -8])
+  const rotateY = useTransform(x, [-0.5, 0.5], [-8, 8])
 
   const handleMouseMove = (e: MouseMoveEvent) => {
     const rect = e.currentTarget.getBoundingClientRect()
@@ -47,8 +47,8 @@ export default function Tilt({
   const handleMouseOut = () => {
     onMouseOut()
     // Animate back to center smoothly
-    animate(x, 0, { type: 'spring', stiffness: 200, damping: 20 })
-    animate(y, 0, { type: 'spring', stiffness: 200, damping: 20 })
+    animate(x, 0, { type: 'spring', stiffness: 150, damping: 20 })
+    animate(y, 0, { type: 'spring', stiffness: 150, damping: 20 })
     setIsHovering(false)
   }
 

@@ -54,5 +54,5 @@ export interface EditorSidebarProps {
   backgroundColor: string
   onToggleBackground: () => void
   onCancel: () => void
-  onSaveScreen: () => void
+  onSave: () => void
 }

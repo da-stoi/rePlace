@@ -25,7 +25,7 @@ import {
   DialogDescription,
   DialogTitle
 } from '@/components/ui/dialog'
-import { OGUploadEditor } from '@/components/upload-editor/UploadEditorOG'
+import { UploadEditor } from '@/components/upload-editor/UploadEditor'
 
 export default function ScreenManager() {
   const [gridView, setGridView] = React.useState(true)
@@ -185,12 +185,12 @@ export default function ScreenManager() {
             aria-label="Image Editor"
             // onOpenChange={state => (!state ? handleEditorClose() : null)}
           >
-            <DialogContent className="m-auto h-full max-h-[calc(100vh_-_8rem)] min-w-[750px] p-3 lg:min-w-[900px]">
+            <DialogContent className="m-auto h-min max-h-[calc(100vh_-_8rem)] min-w-[750px] p-3 lg:min-w-[900px]">
               <DialogTitle className="sr-only">Image editor</DialogTitle>
               <DialogDescription className="sr-only">
                 Edit the image that was just uploaded.
               </DialogDescription>
-              <OGUploadEditor
+              <UploadEditor
                 imageFile={selectedFile}
                 onSave={handleEditorClose}
               />
