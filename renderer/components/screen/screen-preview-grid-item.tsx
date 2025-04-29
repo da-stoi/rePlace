@@ -16,19 +16,21 @@ import {
 export function ScreenPreviewGridItem({
   screen,
   showTitle,
-  editableTitle,
-  showDeleteButton,
-  showDownloadButton,
-  interactive,
-  titlePosition = 'bottom'
+  editableTitle = false,
+  showDeleteButton = false,
+  showDownloadButton = false,
+  interactive = false,
+  titlePosition = 'bottom',
+  className
 }: {
   screen: ScreenInfo
-  showTitle: boolean // Determines whether the title input is shown
-  editableTitle: boolean // Determines whether the title input is editable
-  showDeleteButton: boolean // Determines whether the delete button is shown
-  showDownloadButton: boolean // Determines whether the download button is shown
-  interactive: boolean // Determines whether the carousel is interactive
+  showTitle?: boolean // Determines whether the title input is shown
+  editableTitle?: boolean // Determines whether the title input is editable
+  showDeleteButton?: boolean // Determines whether the delete button is shown
+  showDownloadButton?: boolean // Determines whether the download button is shown
+  interactive?: boolean // Determines whether the carousel is interactive
   titlePosition?: 'top' | 'bottom' // Determines the position of the title input
+  className?: string // Additional class names for styling
 }) {
   const [hovered, setHovered] = React.useState(false)
   const [screenName, setScreenName] = React.useState(screen.name)
@@ -130,7 +132,10 @@ export function ScreenPreviewGridItem({
         alt={screen.name}
         width={220}
         height={280}
-        className="m-auto mb-2 h-full max-h-[calc(100vh_-_18rem)] w-auto rounded-md border"
+        className={cn(
+          'm-auto mb-2 h-full max-h-[calc(100vh_-_18rem)] w-auto rounded-md border',
+          className
+        )}
         onMouseOver={() => setHovered(true)}
         onMouseOut={() => setHovered(false)}
         onClick={() => interactive && setScreenPreviewOpen(true)}

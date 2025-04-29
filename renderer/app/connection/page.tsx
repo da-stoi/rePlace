@@ -4,26 +4,27 @@
 import React from 'react'
 import type { DeviceInfo, DeviceMethod, DeviceType, ScreenInfo } from '@/types'
 import {
+  CheckCircle,
   ChevronsLeftRightEllipsis,
   FolderInput,
   Loader2,
-  Redo,
   Upload,
   X,
   XCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ScreenCarousel } from '@/components/screen/screen-carousel'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import PageLoader from '@/components/page-load'
-// import MultiStepIndicator from '@/components/MultiStepIndicator'
-// import Suspended from '../customTemplates/Suspended'
-// import Batteryempty from '../customTemplates/Batteryempty'
-// import Overheating from '../customTemplates/Overheating'
-// import Poweroff from '../customTemplates/Poweroff'
-// import Rebooting from '../customTemplates/Rebooting'
-// import Starting from '../customTemplates/Starting'
+import MultiStepIndicator from '@/components/connection/multi-step-indicator'
+import { SelectImage } from '@/components/connection/select-screen'
+import { ScreenPreviewGridItem } from '@/components/screen/screen-preview-grid-item'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 
 function ConnectingModal({
   connected,
@@ -105,6 +106,8 @@ export default function Connection() {
   const [selectedRemoteScreen, setSelectedRemoteScreen] =
     React.useState<ScreenInfo | null>(null)
   const [showUploadModal, setShowUploadModal] = React.useState<boolean>(false)
+  const [currentStep, setCurrentStep] = React.useState(0)
+  const [successModalOpen, setSuccessModalOpen] = React.useState<boolean>(false)
 
   const heartbeatIntervalRef = React.useRef(heartbeatInterval)
   const connectionFailedRef = React.useRef(connectionFailed)
@@ -267,6 +270,8 @@ export default function Connection() {
     })
 
     setShowUploadModal(false)
+    setSuccessModalOpen(true)
+    setCurrentStep(0)
   }
 
   React.useEffect(() => {
@@ -278,117 +283,139 @@ export default function Connection() {
     return <PageLoader />
   }
 
-  // New UI
-  // return (
-  //   <div className="mt-20">
-  //     <MultiStepIndicator
-  //       totalSteps={3}
-  //       currentStep={2}
-  //       showStepNumbers={true}
-  //       endpointSize="large"
-  //     />
-  //   </div>
-  // )
-
   return (
-    <div className="mt-20 h-full">
-      <div className="fixed right-0 top-0 mr-10 flex w-max flex-row pl-10 pt-16">
-        <div className="flex flex-row gap-2">
-          <Button
-            variant="default"
-            className="text-background hover:bg-foreground cursor-default">
-            <div
-              className={cn(
-                'm-auto size-2.5 rounded-full',
-                connected
-                  ? 'bg-green-700 dark:bg-green-600'
-                  : 'bg-amber-700 dark:bg-amber-600'
-              )}
-            />
-
-            <h3 className="text-background m-auto">
-              {deviceInfo.displayName || 'reMarkable'}
-            </h3>
-          </Button>
-          <Button
-            size="icon"
-            variant="destructive"
-            onClick={disconnectDevice}>
-            <X />
-          </Button>
-        </div>
+    <div className="mt-20">
+      <div className="fixed right-0 top-0 mr-10 flex w-max flex-row pl-10 pt-20">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="destructive"
+                onClick={disconnectDevice}>
+                <X />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Disconnect</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
+      <div className="fixed bottom-0 right-0 mr-5 flex w-max flex-row pb-5">
+        <Button
+          variant="outline"
+          className="cursor-default">
+          <div
+            className={cn(
+              'm-auto size-2.5 rounded-full',
+              connected
+                ? 'bg-green-700 dark:bg-green-600'
+                : 'bg-amber-700 dark:bg-amber-600'
+            )}
+          />
 
-      <div className="mx-10 mt-32 flex h-full flex-col items-center">
-        <div className="m-auto mt-6 flex w-full flex-row flex-wrap justify-around">
-          <div className="w-full max-w-[calc(50vw_-_15rem)]">
-            <h1 className="text-center text-2xl font-bold">Saved Screens</h1>
-            <ScreenCarousel
-              showTitle
-              className="w-full max-w-[calc(50vw_-_15rem)]"
-              screens={savedScreens}
-              titlePosition={'top'}
-              editableTitle={false}
-              showDeleteButton={false}
-              showDownloadButton={false}
-              showScreenCountBar={false}
-              onSelect={setSelectedSavedScreen}
+          <h3 className="text-foreground m-auto">
+            {deviceInfo.displayName || 'reMarkable'}
+          </h3>
+        </Button>
+      </div>
+      <div className="w-content fixed left-1/2 z-10 mb-10 -translate-x-1/2">
+        <div
+          className={cn(
+            'bg-card flex flex-col items-center gap-3 rounded-xl px-5',
+            currentStep > 0 ? 'pb-2 pt-3' : 'pb-4 pt-6'
+          )}>
+          <div className="flex flex-row items-center gap-2">
+            <MultiStepIndicator
+              showStepNumbers
+              className="w-[calc(100vw_-_15rem)]"
+              totalSteps={3}
+              currentStep={currentStep + 1}
+              endpointSize="large"
             />
-          </div>
-
-          {/* Center graphic */}
-          <div className="my-auto w-min">
-            <Redo className="animate-fade-and-scale-in size-16" />
-          </div>
-
-          <div className="my-auto w-full max-w-[calc(50vw_-_15rem)]">
-            <h1 className="text-center text-2xl font-bold">
-              {deviceInfo.displayName || 'Device'} Screens
-            </h1>
-            {remoteScreens && remoteScreens.length > 0 ? (
-              <ScreenCarousel
-                showTitle
-                className="w-full max-w-[calc(50vw_-_15rem)]"
-                screens={
-                  remoteScreens
-                    ? (remoteScreens.map(screen => ({
-                        id: screen.name,
-                        name: screen.name,
-                        dataUrl: screen.dataUrl,
-                        addDate: new Date()
-                      })) as ScreenInfo[])
-                    : []
-                }
-                titlePosition={'top'}
-                editableTitle={false}
-                showDeleteButton={false}
-                showDownloadButton={false}
-                showScreenCountBar={false}
-                onSelect={setSelectedRemoteScreen}
-              />
-            ) : (
-              <div className="my-auto flex w-full max-w-[calc(50vw_-_15rem)] flex-col items-center gap-4">
-                <h1 className="text-2xl font-bold">
-                  Unable to get device screens
-                </h1>
-              </div>
+            {currentStep > 0 && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  setCurrentStep(prev => prev - 1)
+                }}>
+                Back
+              </Button>
             )}
           </div>
+          <div className="">
+            <h1 className="mb-0 text-center text-xl font-bold">
+              {currentStep === 0
+                ? 'Select a screen to rePlace'
+                : currentStep === 1
+                  ? 'Select a new screen'
+                  : 'Upload screen'}
+            </h1>
+            <p className="text-muted-foreground mt-0 text-center text-sm">
+              {currentStep === 0
+                ? 'Select a screen from your device to replace.'
+                : currentStep === 1
+                  ? 'Select a new screen from your collection to replace the screen your just selected.'
+                  : 'Upload the new screen to your device'}
+            </p>
+          </div>
         </div>
       </div>
-
-      {/* Upload button */}
-      <Button
-        className="text-background fixed bottom-5 left-1/2 -translate-x-1/2"
-        disabled={
-          !connected ||
-          connectionFailed ||
-          !selectedSavedScreen ||
-          !selectedRemoteScreen
-        }
-        onClick={() => setShowUploadModal(true)}>
-        <FolderInput /> Update Screen
-      </Button>
+      <div className="mx-auto w-[calc(100vw_-_15rem)] pt-32">
+        {/* Current step */}
+        {currentStep === 0 && (
+          <SelectImage
+            currentScreens={remoteScreens}
+            selectedScreen={selectedRemoteScreen}
+            selectScreen={remoteScreen => {
+              setSelectedRemoteScreen(remoteScreen)
+              setCurrentStep(prev => prev + 1)
+            }}
+          />
+        )}
+        {currentStep === 1 && (
+          <SelectImage
+            currentScreens={savedScreens}
+            selectedScreen={selectedSavedScreen}
+            selectScreen={remoteScreen => {
+              setSelectedSavedScreen(remoteScreen)
+              setCurrentStep(prev => prev + 1)
+            }}
+          />
+        )}
+        {currentStep === 2 && (
+          <div>
+            <div className="mx-auto flex flex-row items-center justify-center">
+              <div>
+                <h1 className="text-center text-2xl">Current Screen</h1>
+                <ScreenPreviewGridItem
+                  screen={selectedRemoteScreen}
+                  className="m-2 max-w-64"
+                />
+              </div>
+              <div>
+                <h1 className="text-center text-2xl">New Screen</h1>
+                <ScreenPreviewGridItem
+                  screen={selectedSavedScreen}
+                  className="m-2 max-w-64"
+                />
+              </div>
+            </div>
+            {/* Upload button */}
+            <Button
+              className="text-background fixed bottom-5 left-1/2 -translate-x-1/2"
+              disabled={
+                !connected ||
+                connectionFailed ||
+                !selectedSavedScreen ||
+                !selectedRemoteScreen
+              }
+              onClick={() => setShowUploadModal(true)}>
+              <FolderInput /> Update Screen
+            </Button>
+          </div>
+        )}
+      </div>
 
       {/* Confirm upload modal */}
       <Dialog
@@ -412,8 +439,7 @@ export default function Connection() {
               Cancel
             </Button>
             <Button
-              variant="default"
-              className="text-background w-full"
+              className="w-full"
               onClick={uploadScreen}>
               Update Screen
             </Button>
@@ -421,46 +447,39 @@ export default function Connection() {
         </DialogContent>
       </Dialog>
 
-      {/* <Suspended
-        theme={'light'}
-        lostText={''}
-        contactInfo={[]}
-        download={false}
-      />
-      <Batteryempty
-        theme={'light'}
-        download={false}
-      />
-      <Overheating
-        theme={'light'}
-        download={false}
-      />
-      <Poweroff
-        theme={'light'}
-        download={false}
-        lostText={''}
-        contactInfo={[]}
-      />
-      <Rebooting
-        theme={'light'}
-        download={false}
-      />
-      <Starting
-        theme={'light'}
-        download={false}
-      /> */}
-
-      {/* Connecting modal */}
-      <ConnectingModal
-        connected={connected}
-        connectionFailed={connectionFailed}
-        retry={() => {
-          setConnectionFailed(false)
-          setRetryCount(0)
-          connectDevice()
-        }}
-        back={disconnectDevice}
-      />
+      {/* Success modal */}
+      <Dialog
+        open={successModalOpen}
+        onOpenChange={open => {
+          setSuccessModalOpen(open)
+          if (open) {
+            setTimeout(() => {
+              setSuccessModalOpen(false)
+              disconnectDevice()
+            }, 2000)
+          }
+        }}>
+        <DialogContent className="flex flex-col items-center p-10">
+          <DialogTitle className="flex flex-row gap-2 text-3xl font-bold">
+            <CheckCircle className="m-auto size-8" />
+            Screen Updated
+          </DialogTitle>
+          <p className="text-center text-lg">Screen updated successfully!</p>
+          <div className="mt-6 flex w-full flex-row gap-3">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setSuccessModalOpen(false)}>
+              Close
+            </Button>
+            <Button
+              className="w-full"
+              onClick={() => disconnectDevice()}>
+              Disconnect
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

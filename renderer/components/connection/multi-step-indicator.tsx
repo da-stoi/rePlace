@@ -1,6 +1,6 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { Progress } from './ui/progress'
+import { Progress } from '../ui/progress'
 
 interface MultiStepIndicatorProps {
   totalSteps: number
@@ -54,7 +54,7 @@ const MultiStepIndicator: React.FC<MultiStepIndicatorProps> = ({
                 'flex items-center justify-center rounded-full font-semibold transition-all duration-300 ease-in-out',
                 endpointSizeClasses[endpointSize],
                 index < currentStep
-                  ? 'bg-foreground text-black'
+                  ? 'bg-foreground text-background'
                   : 'bg-secondary'
               )}>
               {showStepNumbers && index + 1}
