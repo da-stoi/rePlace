@@ -31,7 +31,7 @@ export default async function checkForAppUpdate(
   const updateRes = await fetch(
     'https://api.github.com/repos/da-stoi/rePlace/releases'
   )
-  let updateDataArray: UpdateData[] = await updateRes.json()
+  let updateDataArray = (await updateRes.json()) as UpdateData[]
 
   if (!Array.isArray(updateDataArray)) {
     console.error('Failed to fetch update data')

@@ -12,7 +12,6 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '../ui/tooltip'
-import Tilt from '../misc/tilt'
 
 export function ScreenPreviewGridItem({
   screen,
@@ -122,21 +121,21 @@ export function ScreenPreviewGridItem({
         )}
       </div>
       {showTitle && titlePosition === 'top' && titleBox}
-      <Tilt
+      {/* <Tilt
         className={'h-full w-full'}
         onMouseOver={() => setHovered(true)}
-        onMouseOut={() => setHovered(false)}>
-        <Image
-          src={screen.dataUrl}
-          alt={screen.name}
-          width={220}
-          height={280}
-          className="m-auto mb-2 h-full max-h-[calc(100vh_-_18rem)] w-auto rounded-md border"
-          // onMouseOver={() => setHovered(true)}
-          // onMouseOut={() => setHovered(false)}
-          onClick={() => interactive && setScreenPreviewOpen(true)}
-        />
-      </Tilt>
+        onMouseOut={() => setHovered(false)}> */}
+      <Image
+        src={screen.dataUrl}
+        alt={screen.name}
+        width={220}
+        height={280}
+        className="m-auto mb-2 h-full max-h-[calc(100vh_-_18rem)] w-auto rounded-md border"
+        onMouseOver={() => setHovered(true)}
+        onMouseOut={() => setHovered(false)}
+        onClick={() => interactive && setScreenPreviewOpen(true)}
+      />
+      {/* </Tilt> */}
       {showTitle && titlePosition === 'bottom' && titleBox}
       <ScreenDialog
         screen={screen}

@@ -60,7 +60,7 @@ function DeviceSelector({
         <Button
           variant="outline"
           className={cn(
-            'm-auto w-fit p-8',
+            'm-auto mb-4 w-fit p-8',
             deviceInfo.type === 'redockable' && 'outline'
           )}
           onClick={() => handleDeviceSelect('redockable')}>

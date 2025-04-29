@@ -4,8 +4,8 @@ import type React from 'react'
 import { useRef, useState, useEffect } from 'react'
 
 import type { ScreenInfo, UserSettings } from '@/types'
-import { EditorSidebar } from './EditorSidebar'
-import { EditorCanvas } from './EditorCanvas'
+import { EditorSidebar } from './editor-sidebar'
+import { EditorCanvas } from './editor-canvas'
 
 const editorWidth = 1404
 const editorHeight = 1872
@@ -55,7 +55,9 @@ export function UploadEditor({ imageFile, onSave }: UploadEditorProps) {
     edges: []
   })
   const [userSettings, setUserSettings] = useState<UserSettings>()
-  const [backgroundColor, setBackgroundColor] = useState('white')
+  const [backgroundColor, setBackgroundColor] = useState(
+    userSettings.theme === 'dark' ? 'black' : 'white'
+  )
   const editorRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -167,12 +169,6 @@ export function UploadEditor({ imageFile, onSave }: UploadEditorProps) {
   // Handle drag start
   const handleDragStart = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!image.url || !editorRef.current) return
-
-    const editorRect = editorRef.current.getBoundingClientRect()
-
-    // // Calculate the scale ratio between the rendered editor and the intended dimensions
-    // const scaleRatioX = editorRect.width / editorWidth
-    // const scaleRatioY = editorRect.height / editorHeight
 
     // Store the initial mouse position and the current image position
     setIsDragging(true)
@@ -413,9 +409,6 @@ export function UploadEditor({ imageFile, onSave }: UploadEditorProps) {
 
     const newScale = Math.min(5, image.scale + 0.1)
 
-    // Get editor dimensions
-    const editorRect = editorRef.current?.getBoundingClientRect()
-
     // Calculate current center position of the image
     const currentScaledWidth = image.naturalWidth * image.scale
     const currentScaledHeight = image.naturalHeight * image.scale
@@ -445,9 +438,6 @@ export function UploadEditor({ imageFile, onSave }: UploadEditorProps) {
     if (!image.url || !editorRef.current) return
 
     const newScale = Math.max(0.1, image.scale - 0.1)
-
-    // Get editor dimensions
-    const editorRect = editorRef.current?.getBoundingClientRect()
 
     // Calculate current center position of the image
     const currentScaledWidth = image.naturalWidth * image.scale
@@ -500,20 +490,6 @@ export function UploadEditor({ imageFile, onSave }: UploadEditorProps) {
   // Toggle background color
   const toggleBackgroundColor = () => {
     setBackgroundColor(prevColor => (prevColor === 'white' ? 'black' : 'white'))
-  }
-
-  // Function to get image dimensions
-  const getImageDimensions = (
-    file: File
-  ): Promise<{ width: number; height: number }> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image()
-      img.onload = () => {
-        resolve({ width: img.width, height: img.height })
-      }
-      img.onerror = reject
-      img.src = URL.createObjectURL(file)
-    })
   }
 
   // Handle save screen

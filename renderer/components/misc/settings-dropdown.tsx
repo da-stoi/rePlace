@@ -1,5 +1,5 @@
 import React from 'react'
-import { BookDashed, BookImage, Settings, Wrench } from 'lucide-react'
+import { BookImage, Settings, Wrench } from 'lucide-react'
 import { Button } from '../ui/button'
 import {
   DropdownMenu,
@@ -33,12 +33,6 @@ export default function SettingsDropdown({
           <DropdownMenuItem onClick={() => navigate('/screen-manager')}>
             <BookImage />
             Screen Manager
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            disabled
-            onClick={() => navigate('/template-manager')}>
-            <BookDashed />
-            Template Manager
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => navigate('/settings')}>

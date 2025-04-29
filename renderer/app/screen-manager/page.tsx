@@ -25,7 +25,8 @@ import {
   DialogDescription,
   DialogTitle
 } from '@/components/ui/dialog'
-import { UploadEditor } from '@/components/upload-editor/UploadEditor'
+import { UploadEditor } from '@/components/upload-editor/upload-editor'
+import { ScreenCreator } from '@/components/screen-creator/creator'
 
 export default function ScreenManager() {
   const [gridView, setGridView] = React.useState(true)
@@ -33,6 +34,7 @@ export default function ScreenManager() {
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null)
   const [isEditorOpen, setIsEditorOpen] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
+  const [isCreatorOpen, setIsCreatorOpen] = React.useState(false)
 
   React.useEffect(() => {
     window.ipc.getScreens()
@@ -49,7 +51,7 @@ export default function ScreenManager() {
   }
 
   const handleCreateScreen = () => {
-    console.log('Create screen')
+    setIsCreatorOpen(true)
   }
 
   const handleEditorClose = () => {
@@ -111,7 +113,6 @@ export default function ScreenManager() {
 
             {/* Create screen */}
             <Button
-              disabled
               variant="default"
               size="sm"
               onClick={handleCreateScreen}>
@@ -204,6 +205,21 @@ export default function ScreenManager() {
           </div>
         </>
       )}
+
+      {/* Image Creator Modal */}
+      <Dialog
+        open={isCreatorOpen}
+        aria-label="Image Creator"
+        // onOpenChange={state => (!state ? handleEditorClose() : null)}
+      >
+        <DialogContent className="m-auto h-min max-h-[calc(100vh_-_8rem)] min-w-[750px] p-3 lg:min-w-[900px]">
+          <DialogTitle className="sr-only">Image creator</DialogTitle>
+          <DialogDescription className="sr-only">
+            Create a new screen.
+          </DialogDescription>
+          <ScreenCreator onSave={() => setIsCreatorOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
