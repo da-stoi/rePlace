@@ -3,9 +3,18 @@ import { store } from '../background'
 import 'dotenv/config'
 
 function platformFromAsset(asset: Asset): string | null {
-  console.log(asset.platform)
-
-  return 'darwin'
+  switch (asset.browser_download_url.split('.').pop()) {
+    case 'dmg':
+      return 'darwin'
+    case 'exe':
+      return 'win32'
+    case 'AppImage':
+      return 'linux'
+    case 'deb':
+      return 'linux'
+    default:
+      return null
+  }
 }
 
 export default async function checkForAppUpdate(
@@ -66,10 +75,10 @@ export default async function checkForAppUpdate(
 
     const assets: Asset[] = updateData.assets
       .map((asset: Asset) => ({
-        platform: platformFromAsset(asset),
-        browserDownloadUrl: asset.browser_download_url
+        ...asset,
+        platform: platformFromAsset(asset)
       }))
-      .filter((asset: Asset) => asset.platform !== null)
+      .filter(asset => asset.platform !== null)
 
     // Parse update data
     updateDetails = {
@@ -78,8 +87,8 @@ export default async function checkForAppUpdate(
       preRelease: updateData.prerelease,
       publishedAt: updateData.published_at,
       body: updateData.body,
-      platformAsset: assets.find(asset => asset.platform === platform),
-      assets
+      platformAssets: assets.filter(asset => asset.platform === platform),
+      otherAssets: assets.filter(asset => asset.platform !== platform)
     }
   }
 

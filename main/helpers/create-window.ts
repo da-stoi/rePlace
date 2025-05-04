@@ -97,14 +97,14 @@ export const createWindow = (
     "object-src 'none'"
   ].join('; ')
 
-  win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
-    callback({
-      responseHeaders: {
-        ...details.responseHeaders,
-        'Content-Security-Policy': [csp]
-      }
-    })
-  })
+  // win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+  //   callback({
+  //     responseHeaders: {
+  //       ...details.responseHeaders,
+  //       'Content-Security-Policy': [csp]
+  //     }
+  //   })
+  // })
 
   const saveState = () => {
     if (!win.isMinimized() && !win.isMaximized()) {

@@ -41,6 +41,8 @@ function DownloadUpdate({ updateDetails }: { updateDetails: UpdateDetails }) {
     return null
   }
 
+  console.log('Update details:', updateDetails)
+
   return (
     <>
       <Separator className="my-4" />
@@ -77,17 +79,37 @@ function DownloadUpdate({ updateDetails }: { updateDetails: UpdateDetails }) {
             </AccordionItem>
           </Accordion>
         </CardContent>
-        <CardFooter>
-          <Button
-            variant="outline"
-            disabled={!updateDetails.platformAsset}
-            onClick={() => {
-              window.ipc.externalLink(
-                updateDetails.platformAsset.browser_download_url
-              )
-            }}>
-            Download rePlace {updateDetails.name}
-          </Button>
+        <CardFooter className="flex flex-col items-start gap-4">
+          {updateDetails.platformAssets &&
+            updateDetails.platformAssets.length > 0 &&
+            updateDetails.platformAssets.map((asset, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                className="mr-2"
+                onClick={() => {
+                  window.ipc.externalLink(asset.browser_download_url)
+                }}>
+                Download {asset.name}
+              </Button>
+            ))}
+          <div className="flex flex-row flex-wrap gap-2">
+            <h3 className="text-foreground/75 text-sm">
+              Other platform options:
+            </h3>
+            {updateDetails.otherAssets &&
+              updateDetails.otherAssets.length > 0 &&
+              updateDetails.otherAssets.map((asset, index) => (
+                <span
+                  key={index}
+                  className="text-foreground/75 hover:text-foreground cursor-pointer text-nowrap text-sm underline hover:no-underline"
+                  onClick={() => {
+                    window.ipc.externalLink(asset.browser_download_url)
+                  }}>
+                  {asset.name}
+                </span>
+              ))}
+          </div>
         </CardFooter>
       </Card>
     </>

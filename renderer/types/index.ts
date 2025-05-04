@@ -84,9 +84,11 @@ type UserSettings = {
 }
 
 type Asset = {
-  platform: string
-  browser_download_url?: string
-  browserDownloadUrl?: string
+  name: string
+  browser_download_url: string
+  size: number
+  updated_at: string
+  platform?: string
 }
 
 type UpdateDetails = {
@@ -95,8 +97,8 @@ type UpdateDetails = {
   preRelease: boolean // prerelease
   publishedAt: string // published_at
   body: string
-  platformAsset?: Asset
-  assets: Asset[]
+  platformAssets?: Asset[]
+  otherAssets: Asset[]
 }
 
 type ScreenInfo = {
