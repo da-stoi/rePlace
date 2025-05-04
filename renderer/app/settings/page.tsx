@@ -8,7 +8,6 @@ import style from '@/styles/markdown.module.css'
 import {
   ChevronLeft,
   FolderGit2,
-  Languages,
   Settings2,
   SettingsIcon,
   SkipForward,
@@ -170,16 +169,14 @@ export default function Settings() {
           <Separator className="my-4" />
 
           {/* Language */}
-          <h3 className="my-5 text-xl">
+          {/* <h3 className="my-5 text-xl">
             <Languages className="mb-1 inline size-5" /> Language
           </h3>
           <div className="ml-4">
             <p className="my-2">Choose your preferred language.</p>
-
-            {/* Language dropdown */}
           </div>
 
-          <Separator className="my-4" />
+          <Separator className="my-4" /> */}
 
           {/* Skip splash screen */}
           <h3 className="my-5 text-xl">

@@ -469,17 +469,29 @@ export default function Connection() {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => setSuccessModalOpen(false)}>
-              Close
+              onClick={() => disconnectDevice()}>
+              Disconnect
             </Button>
             <Button
               className="w-full"
-              onClick={() => disconnectDevice()}>
-              Disconnect
+              onClick={() => setSuccessModalOpen(false)}>
+              Close
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Connecting modal */}
+      <ConnectingModal
+        connected={connected}
+        connectionFailed={connectionFailed}
+        retry={() => {
+          setConnectionFailed(false)
+          setRetryCount(0)
+          connectDevice()
+        }}
+        back={disconnectDevice}
+      />
     </div>
   )
 }

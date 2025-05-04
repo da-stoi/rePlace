@@ -1,6 +1,6 @@
 import type { WindowState } from '@/types'
 import type { BrowserWindowConstructorOptions, Rectangle } from 'electron'
-import { screen, BrowserWindow } from 'electron'
+import { screen, BrowserWindow, app } from 'electron'
 import Store from 'electron-store'
 
 export const createWindow = (
@@ -72,13 +72,6 @@ export const createWindow = (
     return windowState
   }
 
-  const saveState = () => {
-    if (!win.isMinimized() && !win.isMaximized()) {
-      Object.assign(state, getCurrentPosition())
-    }
-    store.set(key, state)
-  }
-
   state = ensureVisibleOnSomeDisplay(restore())
 
   const win = new BrowserWindow({
@@ -90,6 +83,35 @@ export const createWindow = (
       ...options.webPreferences
     }
   })
+
+  const isDev = !app.isPackaged
+
+  const csp = [
+    "default-src 'self'",
+    `script-src 'self'${isDev ? " 'unsafe-eval' 'unsafe-inline'" : ''}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data:",
+    "font-src 'self'",
+    "connect-src 'self' ws: http://localhost:*",
+    "frame-src 'none'",
+    "object-src 'none'"
+  ].join('; ')
+
+  win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [csp]
+      }
+    })
+  })
+
+  const saveState = () => {
+    if (!win.isMinimized() && !win.isMaximized()) {
+      Object.assign(state, getCurrentPosition())
+    }
+    store.set(key, state)
+  }
 
   win.on('close', saveState)
 

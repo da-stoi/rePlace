@@ -2,7 +2,12 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle
+} from '@/components/ui/dialog'
 import DeviceManager from '@/components/device/device-manager'
 import SettingsDropdown from '@/components/misc/settings-dropdown'
 
@@ -27,6 +32,9 @@ export default function Connect() {
               )}>
               My Devices
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Manage your devices and settings
+            </DialogDescription>
 
             {/* Settings */}
             <SettingsDropdown className={hideHeader ? 'hidden' : ''} />

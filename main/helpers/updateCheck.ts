@@ -22,9 +22,16 @@ export default async function checkForAppUpdate(
   const lastCheck = store.get('lastUpdateCheck', 0) as number
 
   const now = Date.now()
-  if (lastCheck && now - lastCheck < 1000 * 60 * 60 * 3) {
-    // 3 hours
-    return lastFetchedUpdate
+  if (lastCheck && now - lastCheck < 1000 * 60 * 60 * 1) {
+    // 1 hour
+    if (lastFetchedUpdate) {
+      if (!preRelease && lastFetchedUpdate.preRelease) {
+        // If pre-release is disabled, check if the last fetched update is a pre-release
+        return false
+      }
+      return lastFetchedUpdate
+    }
+    return false
   }
 
   // Fetch latest release from GitHub

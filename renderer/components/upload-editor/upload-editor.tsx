@@ -3,7 +3,7 @@
 import type React from 'react'
 import { useRef, useState, useEffect } from 'react'
 
-import type { ScreenInfo, UserSettings } from '@/types'
+import type { ScreenInfo } from '@/types'
 import { EditorSidebar } from './editor-sidebar'
 import { EditorCanvas } from './editor-canvas'
 
@@ -54,10 +54,8 @@ export function UploadEditor({ imageFile, onSave }: UploadEditorProps) {
     vertical: false,
     edges: []
   })
-  const [userSettings, setUserSettings] = useState<UserSettings>()
-  const [backgroundColor, setBackgroundColor] = useState(
-    userSettings.theme === 'dark' ? 'black' : 'white'
-  )
+  // const [userSettings, setUserSettings] = useState<UserSettings>()
+  const [backgroundColor, setBackgroundColor] = useState('white')
   const editorRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -83,15 +81,15 @@ export function UploadEditor({ imageFile, onSave }: UploadEditorProps) {
     }
   }
 
-  // Get user settings
-  useEffect(() => {
-    window.ipc.getUserSettings() // Get user data
+  // // Get user settings
+  // useEffect(() => {
+  //   window.ipc.getUserSettings() // Get user data
 
-    // Listen for user settings response
-    window.ipc.on('get-user-settings-res', (settings: UserSettings) => {
-      setUserSettings(settings)
-    })
-  }, [])
+  //   // Listen for user settings response
+  //   window.ipc.on('get-user-settings-res', (settings: UserSettings) => {
+  //     setUserSettings(settings)
+  //   })
+  // }, [])
 
   // Update the image when the imageFile prop is updated
   useEffect(() => {

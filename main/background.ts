@@ -17,7 +17,7 @@ import checkForAppUpdate from './helpers/updateCheck'
 Store.initRenderer() // Initialize store in renderer process
 export const store = new Store() // Initialize store in main process
 
-const isProd = process.env.NODE_ENV === 'production'
+const isProd = app.isPackaged
 
 const sftp = new Client()
 
@@ -243,6 +243,7 @@ ipcMain.on('get-files', (event, _connection) => {
             'starting.png',
             'poweroff.png',
             'suspended.png',
+            'hibernate.png',
             'batteryempty.png',
             'overheating.png',
             'rebooting.png'
