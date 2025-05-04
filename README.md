@@ -128,8 +128,8 @@ Instead, Electron provides [Inter-Process Communication (IPC)](https://www.elect
 **Uploading a Screen**
 
 1. **Establish SSH Connection**
-   - When you add or select a device, a background script receives your device details and opens an [SSH](https://www.wikiwand.com/en/articles/Secure_Shell) session.
-2. **Send the Image**
+   - When you connect to a device, a background script receives your device details and opens an [SSH](https://www.wikiwand.com/en/articles/Secure_Shell) session.
+1. **Send the Image**
    - Upon uploading, the UI sends the image as a [Data URL](https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/data) plus the target filename via IPC.
    - The background script decodes this Data URL and streams the resulting image over SSH, replacing the existing file on your reMarkable.
 3. **Live Device Monitoring**
@@ -155,7 +155,7 @@ While extensive care was put into putting safeguards in place to protect your **
 
 - **Warranty & Support Voiding**
   - Beyond manufacturer warranty, any third-party support channels (e.g., community help forums or paid repair services) may refuse assistance for modified devices.
-- [Bricking](<https://www.wikiwand.com/en/articles/Brick_(electronics)>) your device
+- [Bricking](https://en.wikipedia.org/wiki/Brick_(electronics)) your device
   - “Rendering your device as useful as a paperweight” i.e. firmware corruption or failed writes have turned it into a completely non-functional brick.
   - There are ways to recover your device from this state, but they involve highly technical knowledge.
 - **Security Vulnerabilities**
