@@ -3,13 +3,12 @@ import { ScreenPreviewGridItem } from '../screen/screen-preview-grid-item'
 
 interface SelectOldImageProps {
   currentScreens: ScreenInfo[]
-  selectedScreen: ScreenInfo | null
+  selectedScreen?: ScreenInfo
   selectScreen: (image: ScreenInfo) => void
 }
 
 export function SelectImage({
   currentScreens,
-  selectedScreen,
   selectScreen
 }: SelectOldImageProps) {
   return (

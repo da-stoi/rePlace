@@ -1,3 +1,4 @@
+import { app } from 'electron'
 import type { Asset, UpdateData, UpdateDetails } from '../../renderer/types'
 import { store } from '../background'
 import 'dotenv/config'
@@ -23,7 +24,7 @@ export default async function checkForAppUpdate(
   let updateAvailable = false
   let updateDetails: UpdateDetails
   const platform = process.platform
-  const currentVersion = process.env.RELEASE_TAG
+  const currentVersion = app.getVersion()
   const lastFetchedUpdate = store.get('latestUpdate', false) as
     | UpdateDetails
     | false
@@ -33,7 +34,10 @@ export default async function checkForAppUpdate(
   const now = Date.now()
   if (lastCheck && now - lastCheck < 1000 * 60 * 60 * 1) {
     // 1 hour
-    if (lastFetchedUpdate) {
+    if (
+      lastFetchedUpdate &&
+      currentVersion !== lastFetchedUpdate?.id.replace('v', '')
+    ) {
       if (!preRelease && lastFetchedUpdate.preRelease) {
         // If pre-release is disabled, check if the last fetched update is a pre-release
         return false
@@ -67,7 +71,7 @@ export default async function checkForAppUpdate(
 
   const updateData = updateDataArray[0] // Get latest release
 
-  const latestVersion = updateData?.tag_name
+  const latestVersion = updateData?.tag_name.replace('v', '')
 
   // Check if update is available
   if (currentVersion !== latestVersion && updateData.draft === false) {
@@ -83,7 +87,7 @@ export default async function checkForAppUpdate(
     // Parse update data
     updateDetails = {
       name: updateData.name,
-      id: updateData.id,
+      id: updateData.tag_name,
       preRelease: updateData.prerelease,
       publishedAt: updateData.published_at,
       body: updateData.body,

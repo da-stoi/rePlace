@@ -92,7 +92,7 @@ type Asset = {
 }
 
 type UpdateDetails = {
-  id: number // tag_name
+  id: string // tag_name
   name: string // name
   preRelease: boolean // prerelease
   publishedAt: string // published_at
