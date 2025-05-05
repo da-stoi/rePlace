@@ -1,6 +1,6 @@
 appId: com.danielstoiber.replace
 productName: rePlace
-copyright: Copyright © 2024 Daniel Stoiber
+copyright: Copyright © 2025 Daniel Stoiber
 
 directories:
   output: dist
@@ -53,7 +53,7 @@ linux:
       arch: x64
   artifactName: '${productName}-${version}-linux.${ext}'
   category: Utility
-  synopsis: 'A cross-platform application by Daniel Stoiber'
-  description: 'rePlace is an application designed to perform efficient cross-platform operations.'
-  maintainer: 'Daniel Stoiber <replace@stoiber.network>'
+  synopsis: 'A cross-platform application to customize reMarkable tablets'
+  description: 'rePlace is an application for customizing the various screens of a reMarkable tablet.'
+  maintainer: 'Daniel Stoiber <replace@danielstoiber.com>'
   icon: 'resources/icon.png'

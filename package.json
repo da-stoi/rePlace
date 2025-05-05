@@ -1,10 +1,10 @@
 {
   "name": "rePlace",
   "description": "Customize your reMarkable state screens.",
-  "version": "1.1.0",
-  "author": "Daniel Stoiber <daniel@stoiber.network>",
+  "version": "1.0.0",
+  "author": "Daniel Stoiber <me@danielstoiber.me>",
   "main": "app/background.js",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/da-stoi/rePlace"
